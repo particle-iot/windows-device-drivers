@@ -1,0 +1,36 @@
+
+#include <winver.h>
+
+#define RT_MANIFEST 24
+#define ID_MANIFEST 1
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION    VER_VERSION
+PRODUCTVERSION VER_VERSION
+FILEFLAGSMASK  0x3FL
+FILEFLAGS      0x0L
+FILEOS         VOS_NT_WINDOWS32
+FILETYPE       VER_FILETYPE
+FILESUBTYPE    VER_FILESUBTYPE
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"  
+        BEGIN
+            VALUE "CompanyName",     "http://www.recursion.jp/avrcdc/"
+            VALUE "FileDescription", VER_FILEDESCRIPTION_STR
+            VALUE "FileVersion",     VER_VERSION_STR
+            VALUE "InternalName",    VER_INTERNALNAME_STR
+            VALUE "LegalCopyright",  "2008-2009 Osamu Tamura"
+            VALUE "OriginalFilename",VER_ORIGINALFILENAME_STR
+            VALUE "ProductName",     VER_FILEDESCRIPTION_STR
+            VALUE "ProductVersion",  VER_VERSION_STR
+        END
+    END
+
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
