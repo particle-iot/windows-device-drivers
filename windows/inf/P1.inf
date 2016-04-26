@@ -9,7 +9,7 @@ ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
 Provider=%PROVIDER% 
 LayoutFile=layout.inf
 DriverVer=04/24/2016,6.0.0.0
-CatalogFile=electron.cat
+CatalogFile=P1.cat
 
 [Manufacturer] 
 %PROVIDER%=DeviceList, NTx86, NTia64, NTamd64, NTARM
