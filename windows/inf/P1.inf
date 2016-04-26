@@ -9,10 +9,10 @@ ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
 Provider=%PROVIDER% 
 LayoutFile=layout.inf
 DriverVer=04/24/2016,6.0.0.0
-CatalogFile=P1.cat
+CatalogFile=electron.cat
 
 [Manufacturer] 
-%DEVICE_DESCRIPTION%=DeviceList, NTx86, NTia64, NTamd64, NTARM
+%PROVIDER%=DeviceList, NTx86, NTia64, NTamd64, NTARM
 
 [DeviceList.NTx86] 
 %DEVICE_DESCRIPTION1%=DriverInstall, USB\VID_2B04&PID_C008&MI_00
@@ -30,10 +30,10 @@ CatalogFile=P1.cat
 %DEVICE_DESCRIPTION1%=DriverInstall, USB\VID_2B04&PID_C008&MI_00
 %DEVICE_DESCRIPTION2%=DriverInstall, USB\VID_2B04&PID_C008&MI_02
 
-
 [DriverCopyFiles]
 usbser.sys,,,0x20
 ;serenum.sys,,,0x20
+lowcdc.sys
 
 ;------------------------------------------------------------------------------
 ;  Installation Configuration
@@ -45,7 +45,8 @@ CopyFiles=DriverCopyFiles
 AddReg=DriverInstall.AddReg 
 
 [DriverInstall.HW] 
-AddReg=DriverInstall.HW.AddReg 
+;AddReg=DriverInstall.HW.AddReg 
+AddReg=DriverLower.HW
 
 [DriverInstall.AddReg]
 HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
@@ -58,7 +59,11 @@ HKR,,PortSubClass,1,01
 
 [DriverInstall.Services] 
 AddService=usbser, 0x00000002, UsbserService
+AddService=lowcdc, 0x00000000, DriverLower.AddService
 ;AddService=Serenum,,SerenumService
+
+[DriverLower.HW]
+HKR,,LowerFilters, 0x00010000, "lowcdc"
 
 ;------------------------------------------------------------------------------
 ;  Usbser Service
@@ -70,7 +75,14 @@ ServiceType=1
 StartType=3
 ErrorControl=1
 ServiceBinary=%12%\usbser.sys 
-LoadOrderGroup = Base
+LoadOrderGroup = PNP Filter
+
+[DriverLower.AddService]
+DisplayName=%LOWCDC.DESC%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\lowcdc.sys
 
 ;------------------------------------------------------------------------------
 ;  Serenum Service
@@ -93,4 +105,5 @@ PROVIDER="Particle"
 DEVICE_DESCRIPTION1 ="P1 Serial"
 DEVICE_DESCRIPTION2 ="P1 USBSerial1"
 USBSER.DESC = "USB Serial Driver"
+LOWCDC.DESC = "lowcdc driver"
 ;SERENUM.DESC = "Serenum Filter Driver"
