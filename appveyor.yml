@@ -1,6 +1,20 @@
 version: 6.1.0.{build}
 configuration: Release
 platform: All
+
+environment:
+  enc_secret:
+    secure: iBAwCL/1SI3W95nhf1Bx9gbh+ORu8dsPBD7G4bFdRhU=  
+  key_secret:
+     secure: WBc0/0gRXwnK61Clw6HY0SAyEHSqFPYrScVBoXcjTUo=
+  signtool:  C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\signtool.exe
+  inf2cat: C:\Program Files (x86)\Windows Kits\10\bin\x86\inf2cat.exe
+
+install:
+  - nuget install secure-file -ExcludeVersion
+  - secure-file\tools\secure-file -decrypt windows_key.p12.appveyor.enc -out windows_key.p12 -secret %enc_secret%
+
+
 build:
   project: lowcdc/lowcdc.proj
   verbosity: minimal
