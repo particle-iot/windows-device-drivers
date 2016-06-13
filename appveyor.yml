@@ -5,7 +5,6 @@ platform:
 - x64
 build:
   project: lowcdc/lowcdc.sln
-  verbosity: detailed
+  verbosity: minimal
 artifacts:
-- path: lowcdc\Release\x64\lowcdc.sys
-- path: lowcdc\Release\Win32\lowcdc.sys
+- path: lowcdc\Release\**\*.sys
