@@ -1,0 +1,11 @@
+version: 6.1.0.{build}
+configuration: Release
+platform:
+- Win32
+- x64
+build:
+  project: lowcdc/lowcdc.sln
+  verbosity: detailed
+artifacts:
+- path: lowcdc\Release\x64\lowcdc.sys
+- path: lowcdc\Release\Win32\lowcdc.sys
