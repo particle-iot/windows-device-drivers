@@ -1,10 +1,11 @@
 version: 6.1.0.{build}
 configuration: Release
-platform:
-- Win32
-- x64
+platform: All
 build:
-  project: lowcdc/lowcdc.sln
+  project: lowcdc/lowcdc.proj
   verbosity: minimal
 artifacts:
-- path: lowcdc\Release\**\*.sys
+- path: "*.zip"
+
+after_build:
+- ps: .\.appveyor\appveyor.after-build.ps1

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Solution Include="lowcdc.sln">
+      <Properties>Configuration=Release;Platform=Win32</Properties>
+    </Solution>
+    <Solution Include="lowcdc.sln">
+      <Properties>Configuration=Release;Platform=x64</Properties>
+    </Solution>
+  </ItemGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">All</Platform>
+  </PropertyGroup>
+  <Target Name="Build">
+    <MSBuild Projects="@(Solution)" BuildInParallel="true" Targets="Build" />
+  </Target>
+  <Target Name="Clean">
+    <MSBuild Projects="@(Solution)" BuildInParallel="true" Targets="Clean" />
+  </Target>
+  <Target Name="Rebuild">
+    <MSBuild Projects="@(Solution)" BuildInParallel="true" Targets="Rebuild" />
+  </Target>
+</Project>
