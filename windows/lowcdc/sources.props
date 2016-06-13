@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ImportFilePath_646FD16715A24D91A824285E789032A0 Condition="'$(OVERRIDE_ImportFilePath_646FD16715A24D91A824285E789032A0)'!='true'">sources.inc.props</ImportFilePath_646FD16715A24D91A824285E789032A0>
+    <ImportFilePath_646FD16715A24D91A824285E789032A0 Condition="(!$([System.IO.Path]::IsPathRooted('sources.inc.props'))) And ('$(OVERRIDE_ImportFilePath_646FD16715A24D91A824285E789032A0)'!='true')">$([System.IO.Path]::Combine($(MSBuildProjectDirectory),'sources.inc.props'))</ImportFilePath_646FD16715A24D91A824285E789032A0>
+    <AlternateImportFilePath_CB57BD7A261C45C592DCFD82D4C9FB57 Condition="'$(OVERRIDE_AlternateImportFilePath_CB57BD7A261C45C592DCFD82D4C9FB57)'!='true'">$([System.IO.Path]::Combine($(MSBuildThisFileDirectory),'sources.inc.props'))</AlternateImportFilePath_CB57BD7A261C45C592DCFD82D4C9FB57>
+  </PropertyGroup>
+  <Import Project="$(ImportFilePath_646FD16715A24D91A824285E789032A0)" Condition="Exists($(ImportFilePath_646FD16715A24D91A824285E789032A0))" />
+  <Import Project="$(AlternateImportFilePath_CB57BD7A261C45C592DCFD82D4C9FB57)" Condition="!Exists($(ImportFilePath_646FD16715A24D91A824285E789032A0))" />
+  <PropertyGroup>
+    <TARGETNAME Condition="'$(OVERRIDE_TARGETNAME)'!='true'">lowcdc</TARGETNAME>
+    <C_DEFINES Condition="'$(OVERRIDE_C_DEFINES)'!='true'">$(C_DEFINES)  			/DVERSION_MAJOR=1 /DVERSION_MINOR=0 /DVERSION_MICRO=1              /DVERSION_NANO=3 /DVER_VERSION=1,0,1,3              /DVER_VERSION_STR="\"1.0.1.3\""</C_DEFINES>
+  </PropertyGroup>
+</Project>
