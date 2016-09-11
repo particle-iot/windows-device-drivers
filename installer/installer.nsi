@@ -15,7 +15,7 @@
 
   !define PRODUCT_NAME "Particle Device Drivers"
   !ifndef PRODUCT_VERSION
-  	!define PRODUCT_VERSION "6.1.0.0"
+    !define PRODUCT_VERSION "6.1.0.0"
   !endif
   !define PRODUCT_PUBLISHER "Particle"
   !define PRODUCT_WEBSITE "http://particle.io"
@@ -28,7 +28,7 @@
   InstallDir "$TEMP\particle_drivers_${PRODUCT_VERSION}"
 
   !ifndef DRIVERSDIR
-  	!define DRIVERSDIR "drivers"
+    !define DRIVERSDIR "drivers"
   !endif
 
 ;--------------------------------
@@ -54,6 +54,16 @@
  
   !insertmacro MUI_LANGUAGE "English"
 
+
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${PRODUCT_NAME}"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" ""
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "${PRODUCT_PUBLISHER}"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalTrademarks" ""
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" ""
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${PRODUCT_NAME} Installer"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${PRODUCT_VERSION}"
+  VIProductVersion "${PRODUCT_VERSION}"
+
 ;--------------------------------
 ;Installer Sections
 
@@ -70,34 +80,34 @@ ${StrTok}
 ;   Call Trim
 ;   Pop 
 Function Trim
-	Exch $R1 ; Original string
-	Push $R2
+  Exch $R1 ; Original string
+  Push $R2
  
 Loop:
-	StrCpy $R2 "$R1" 1
-	StrCmp "$R2" " " TrimLeft
-	StrCmp "$R2" "$\r" TrimLeft
-	StrCmp "$R2" "$\n" TrimLeft
-	StrCmp "$R2" "$\t" TrimLeft
-	GoTo Loop2
-TrimLeft:	
-	StrCpy $R1 "$R1" "" 1
-	Goto Loop
+  StrCpy $R2 "$R1" 1
+  StrCmp "$R2" " " TrimLeft
+  StrCmp "$R2" "$\r" TrimLeft
+  StrCmp "$R2" "$\n" TrimLeft
+  StrCmp "$R2" "$\t" TrimLeft
+  GoTo Loop2
+TrimLeft: 
+  StrCpy $R1 "$R1" "" 1
+  Goto Loop
  
 Loop2:
-	StrCpy $R2 "$R1" 1 -1
-	StrCmp "$R2" " " TrimRight
-	StrCmp "$R2" "$\r" TrimRight
-	StrCmp "$R2" "$\n" TrimRight
-	StrCmp "$R2" "$\t" TrimRight
-	GoTo Done
-TrimRight:	
-	StrCpy $R1 "$R1" -1
-	Goto Loop2
+  StrCpy $R2 "$R1" 1 -1
+  StrCmp "$R2" " " TrimRight
+  StrCmp "$R2" "$\r" TrimRight
+  StrCmp "$R2" "$\n" TrimRight
+  StrCmp "$R2" "$\t" TrimRight
+  GoTo Done
+TrimRight:  
+  StrCpy $R1 "$R1" -1
+  Goto Loop2
  
 Done:
-	Pop $R2
-	Exch $R1
+  Pop $R2
+  Exch $R1
 FunctionEnd
 
 ; Usage:
@@ -112,160 +122,162 @@ FunctionEnd
 !macroend
 
 !macro DeleteParticleDevices
-	DetailPrint "Looking for installed Particle devices"
-	${DisableX64FSRedirection}
-	ExecDos::exec /TIMEOUT=2000 '"$INSTDIR\bin\$ARCH\$DEVCON" findall USB\VID_2B04&PID_C0*' "" "$INSTDIR\usbdevs.log"
-	Pop $0
-	${LineFind} "$INSTDIR\usbdevs.log" "/NUL" "1:-1" "DeleteDevice"
-	${EnableX64FSRedirection}
+  DetailPrint "Looking for installed Particle devices"
+  ${DisableX64FSRedirection}
+  ExecDos::exec /TIMEOUT=2000 '"$INSTDIR\bin\$ARCH\$DEVCON" findall USB\VID_2B04&PID_C0*' "" "$INSTDIR\usbdevs.log"
+  Pop $0
+  ${LineFind} "$INSTDIR\usbdevs.log" "/NUL" "1:-1" "DeleteDevice"
+  ${EnableX64FSRedirection}
 !macroend
 
 Function CleanUsbCache
-	DetailPrint "Cleaning USB driver cache"
-	StrCpy $0 0
-	${Do}
-	  EnumRegKey $1 HKLM "SYSTEM\CurrentControlSet\Enum\USB" $0
-	  ${If} $1 == ""
-	  	${ExitDo}
-	  ${EndIf}
-	  IntOp $0 $0 + 1
-	  ${StrStr} $2 $1 "VID_2B04&PID_C0"
-	  ${If} $2 != ""
-	  	StrCpy $2 "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USB\$1"
-	  	DetailPrint "Removing from registry $2"
-			${DisableX64FSRedirection}
-			ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\x86\PsExec.exe" -accepteula -s reg delete "$2" /f' "" ""
-			Pop $3
-			ExecDos::wait $3
-			Pop $4
-			${EnableX64FSRedirection}
-	  ${EndIf}
-	${Loop}
+  DetailPrint "Cleaning USB driver cache"
+  StrCpy $0 0
+  ${Do}
+    EnumRegKey $1 HKLM "SYSTEM\CurrentControlSet\Enum\USB" $0
+    ${If} $1 == ""
+      ${ExitDo}
+    ${EndIf}
+    IntOp $0 $0 + 1
+    ${StrStr} $2 $1 "VID_2B04&PID_C0"
+    ${If} $2 != ""
+      StrCpy $2 "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USB\$1"
+      DetailPrint "Removing from registry $2"
+      ${DisableX64FSRedirection}
+      ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\x86\PsExec.exe" -accepteula -s reg delete "$2" /f' "" ""
+      Pop $3
+      ExecDos::wait $3
+      Pop $4
+      ${EnableX64FSRedirection}
+    ${EndIf}
+  ${Loop}
 
-	StrCpy $0 0
-	${Do}
-	  EnumRegKey $1 HKLM "SYSTEM\CurrentControlSet\Control\usbflags" $0
-	  ${If} $1 == ""
-	  	${ExitDo}
-	  ${EndIf}
-	  IntOp $0 $0 + 1
-	  ${StrStr} $2 $1 "2B04C0"
-	  ${If} $2 != ""
-	  	StrCpy $2 "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\usbflags\$1"
-	  	DetailPrint "Removing from registry $2"
-			${DisableX64FSRedirection}
-			ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\x86\PsExec.exe" -accepteula -s reg delete "$2" /f' "" ""
-			Pop $3
-			ExecDos::wait $3
-			Pop $4
-			${EnableX64FSRedirection}
-	  ${EndIf}
-	${Loop}
+  StrCpy $0 0
+  ${Do}
+    EnumRegKey $1 HKLM "SYSTEM\CurrentControlSet\Control\usbflags" $0
+    ${If} $1 == ""
+      ${ExitDo}
+    ${EndIf}
+    IntOp $0 $0 + 1
+    ${StrStr} $2 $1 "2B04C0"
+    ${If} $2 != ""
+      StrCpy $2 "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\usbflags\$1"
+      DetailPrint "Removing from registry $2"
+      ${DisableX64FSRedirection}
+      ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\x86\PsExec.exe" -accepteula -s reg delete "$2" /f' "" ""
+      Pop $3
+      ExecDos::wait $3
+      Pop $4
+      ${EnableX64FSRedirection}
+    ${EndIf}
+  ${Loop}
 
 FunctionEnd
 
 !macro DeleteParticleDrivers
-	DetailPrint "Looking for installed Particle drivers"
-	${DisableX64FSRedirection}
-	ExecDos::exec /TIMEOUT=2000 '"$INSTDIR\bin\$ARCH\$DEVCON" dp_enum' "" "$INSTDIR\oem.log"
-	Pop $0
-	${LineFind} "$INSTDIR\oem.log" "/NUL" "1:-1" "DeleteOemInf"
-	${EnableX64FSRedirection}
+  DetailPrint "Looking for installed Particle drivers"
+  ${DisableX64FSRedirection}
+  ExecDos::exec /TIMEOUT=2000 '"$INSTDIR\bin\$ARCH\$DEVCON" dp_enum' "" "$INSTDIR\oem.log"
+  Pop $0
+  ${LineFind} "$INSTDIR\oem.log" "/NUL" "1:-1" "DeleteOemInf"
+  ${EnableX64FSRedirection}
 !macroend
 
 !macro RescanDevices
-	DetailPrint "Rescan connected devices"
-	${DisableX64FSRedirection}
-	ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" rescan' "" ""
-	Pop $0
-	${EnableX64FSRedirection}
+  DetailPrint "Rescan connected devices"
+  ${DisableX64FSRedirection}
+  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" rescan' "" ""
+  Pop $0
+  ${EnableX64FSRedirection}
 !macroend
 
 
 !macro CleanInstDir
-	SetOutPath "$TEMP"
-	RMDir /r "$INSTDIR"
+  SetOutPath "$TEMP"
+  RMDir /r "$INSTDIR"
 !macroend
 
 Function DeleteDevice
-	${StrStr} $1 $R9 "USB"
-	${If} $1 == $R9
-		${StrTok} $2 $1 ":" "0" "1"
-		${Trim} $1 $2
-		DetailPrint "Removing $1"
-		${DisableX64FSRedirection}
-		ExecDos::exec /DETAILED /TIMEOUT=2000 '"$INSTDIR\bin\$ARCH\$DEVCON" remove "@$1"' "" ""
-		Pop $3
-		ExecDos::wait $3
-		Pop $4
-		${EnableX64FSRedirection}
-	${EndIf}
-	StrCpy $0 ""
-	Push $0
+  ${StrStr} $1 $R9 "USB"
+  ${If} $1 == $R9
+    ${StrTok} $2 $1 ":" "0" "1"
+    ${Trim} $1 $2
+    DetailPrint "Removing $1"
+    ${DisableX64FSRedirection}
+    ExecDos::exec /DETAILED /TIMEOUT=2000 '"$INSTDIR\bin\$ARCH\$DEVCON" remove "@$1"' "" ""
+    Pop $3
+    ExecDos::wait $3
+    Pop $4
+    ${EnableX64FSRedirection}
+  ${EndIf}
+  StrCpy $0 ""
+  Push $0
 FunctionEnd
 
 Function DeleteOemInf
-	${StrStr} $1 $R9 "oem"
-	${If} $1 == $R9
-		; oemXXX.inf
-		; save in $R1
-		${Trim} $R1 $1
-	${Else}
-		${Trim} $1 $R9
-		${StrStr} $2 $1 "Provider:"
-		${If} $2 == "Provider: Particle" 
-		${AndIf} $R1 != ""
-			DetailPrint "Deleting $R1"
-			${DisableX64FSRedirection}
-			ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" -f dp_delete "$R1"' "" ""
-			Pop $3
-			ExecDos::wait $3
-			Pop $4
-			${EnableX64FSRedirection}
-		${EndIf}
-	${EndIf}
-	StrCpy $0 ""
-	Push $0
+  ${StrStr} $1 $R9 "oem"
+  ${If} $1 == $R9
+    ; oemXXX.inf
+    ; save in $R1
+    ${Trim} $R1 $1
+  ${Else}
+    ${Trim} $1 $R9
+    ${StrStr} $2 $1 "Provider:"
+    ${If} $2 == "Provider: Particle" 
+    ${AndIf} $R1 != ""
+      DetailPrint "Deleting $R1"
+      ${DisableX64FSRedirection}
+      ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" -f dp_delete "$R1"' "" ""
+      Pop $3
+      ExecDos::wait $3
+      Pop $4
+      ${EnableX64FSRedirection}
+    ${EndIf}
+  ${EndIf}
+  StrCpy $0 ""
+  Push $0
 FunctionEnd
 
 Section "Uninstall current drivers" SecCleanDrivers
-	UserInfo::GetAccountType
-	Pop $1
-	${If} $1 != "Admin"
-		SetErrorLevel 740
-		Abort "This installer needs to be run with administrative privileges"
-	${EndIf}
+  UserInfo::GetAccountType
+  Pop $1
+  ${If} $1 != "Admin"
+    SetErrorLevel 740
+    Abort "This installer needs to be run with administrative privileges"
+  ${EndIf}
 
-	SetOutPath "$INSTDIR"
-	File /r bin
+  SetOutPath "$INSTDIR"
+  File /r bin
 
-	!insertmacro DeleteParticleDevices
-	!insertmacro DeleteParticleDrivers
-	Call CleanUsbCache
+  !insertmacro DeleteParticleDevices
+  !insertmacro DeleteParticleDrivers
+  Call CleanUsbCache
 
-	DeleteRegKey HKLM "Software\Particle\Drivers"
+  DeleteRegKey HKLM "Software\Particle\Drivers"
 SectionEnd
 
 Section "Particle Drivers" SecDrivers
-	UserInfo::GetAccountType
-	Pop $1
-	${If} $1 != "Admin"
-		SetErrorLevel 740
-		Abort "This installer needs to be run with administrative privileges"
-	${EndIf}
+  UserInfo::GetAccountType
+  Pop $1
+  ${If} $1 != "Admin"
+    SetErrorLevel 740
+    Abort "This installer needs to be run with administrative privileges"
+  ${EndIf}
 
-	SetOutPath "$INSTDIR"
-  File /r "${DRIVERSDIR}"
+  SetOutPath "$INSTDIR\drivers"
+  File /r "${DRIVERSDIR}\*"
+
+  SetOutPath "$INSTDIR"
 
   DetailPrint "Installing particle.inf"
   ${DisableX64FSRedirection}
-	ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" dp_add "$INSTDIR\drivers\particle.inf"' "" ""
-	Pop $0
-	${EnableX64FSRedirection}
+  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" dp_add "$INSTDIR\drivers\particle.inf"' "" ""
+  Pop $0
+  ${EnableX64FSRedirection}
 
-	!insertmacro RescanDevices
+  !insertmacro RescanDevices
 
-	WriteRegDWORD HKLM "Software\Particle\Drivers" "Installed" 1
+  WriteRegDWORD HKLM "Software\Particle\Drivers" "Installed" 1
 SectionEnd
 
 ;--------------------------------
@@ -277,7 +289,7 @@ SectionEnd
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  	!insertmacro MUI_DESCRIPTION_TEXT ${SecCleanDrivers} $(DESC_SecCleanDrivers)
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecCleanDrivers} $(DESC_SecCleanDrivers)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecDrivers} $(DESC_SecDrivers)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
  
@@ -297,48 +309,48 @@ SectionEnd
 ;--------------------------------
 ;init
 Function .onInit
-	${If} ${RunningX64}
-		StrCpy $ARCH "amd64"
-		SetRegView 64
-	${Else}
-		StrCpy $ARCH "x86"
-	${EndIf}
-	${If} ${IsWin10}
-		!insertmacro SetSectionFlag ${SecDrivers} ${SF_RO}
-		!insertmacro ClearSectionFlag ${SecDrivers} ${SF_SELECTED}
-		MessageBox MB_OK|MB_ICONEXCLAMATION "Particle devices don't require driver installation on Windows 10. If you installed Particle device drivers previously this installer can cleanly remove them." IDOK
-	${EndIf}
+  ${If} ${RunningX64}
+    StrCpy $ARCH "amd64"
+    SetRegView 64
+  ${Else}
+    StrCpy $ARCH "x86"
+  ${EndIf}
+  ${If} ${IsWin10}
+    !insertmacro SetSectionFlag ${SecDrivers} ${SF_RO}
+    !insertmacro ClearSectionFlag ${SecDrivers} ${SF_SELECTED}
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Particle devices don't require driver installation on Windows 10. If you installed Particle device drivers previously this installer can cleanly remove them." IDOK
+  ${EndIf}
 
-	${If} ${AtLeastWinXP}
-		; ok
-	${Else}
-		MessageBox MB_OK|MB_ICONEXCLAMATION "The installer requires Windows XP or newer" IDOK
-		Abort
-	${EndIf}
+  ${If} ${AtLeastWinXP}
+    ; ok
+  ${Else}
+    MessageBox MB_OK|MB_ICONEXCLAMATION "The installer requires Windows XP or newer" IDOK
+    Abort
+  ${EndIf}
 
-	${If} ${AtMostWinXP}
-		StrCpy $DEVCON "devcon_xp.exe"
-	${Else}
-		StrCpy $DEVCON "devcon.exe"
-	${EndIf}
+  ${If} ${AtMostWinXP}
+    StrCpy $DEVCON "devcon_xp.exe"
+  ${Else}
+    StrCpy $DEVCON "devcon.exe"
+  ${EndIf}
 
-	!insertmacro CleanInstDir
+  !insertmacro CleanInstDir
 
-	${If} ${Silent}
-		ReadRegDWORD $0 HKLM "Software\Particle\Drivers" "Installed"
-		${If} $0 = 1
-			; If running silent, skip installation if already installed
-			Abort
-		${EndIf}
-	${EndIf}
+  ${If} ${Silent}
+    ReadRegDWORD $0 HKLM "Software\Particle\Drivers" "Installed"
+    ${If} $0 = 1
+      ; If running silent, skip installation if already installed
+      Abort
+    ${EndIf}
+  ${EndIf}
 FunctionEnd
 
 Function .onInstSuccess
-	!insertmacro CleanInstDir
-	MessageBox MB_YESNO|MB_ICONQUESTION "Do you wish to reboot the system?" IDNO +2
-	Reboot
+  !insertmacro CleanInstDir
+  MessageBox MB_YESNO|MB_ICONQUESTION "Do you wish to reboot the system?" IDNO +2
+  Reboot
 FunctionEnd
 
 Function .onInstFailed
-	!insertmacro CleanInstDir
+  !insertmacro CleanInstDir
 FunctionEnd
