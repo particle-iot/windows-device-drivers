@@ -124,7 +124,7 @@ FunctionEnd
 !macro DeleteParticleDevices
   DetailPrint "Looking for installed Particle devices"
   ${DisableX64FSRedirection}
-  ExecDos::exec /TIMEOUT=2000 '"$INSTDIR\bin\$ARCH\$DEVCON" findall USB\VID_2B04&PID_C0*' "" "$INSTDIR\usbdevs.log"
+  ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\$ARCH\$DEVCON" findall USB\VID_2B04&PID_C0*' "" "$INSTDIR\usbdevs.log"
   Pop $0
   ${LineFind} "$INSTDIR\usbdevs.log" "/NUL" "1:-1" "DeleteDevice"
   ${EnableX64FSRedirection}
@@ -144,10 +144,8 @@ Function CleanUsbCache
       StrCpy $2 "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USB\$1"
       DetailPrint "Removing from registry $2"
       ${DisableX64FSRedirection}
-      ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\x86\PsExec.exe" -accepteula -s reg delete "$2" /f' "" ""
+      ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\x86\PsExec.exe" -accepteula -s reg delete "$2" /f' ""
       Pop $3
-      ExecDos::wait $3
-      Pop $4
       ${EnableX64FSRedirection}
     ${EndIf}
   ${Loop}
@@ -164,10 +162,8 @@ Function CleanUsbCache
       StrCpy $2 "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\usbflags\$1"
       DetailPrint "Removing from registry $2"
       ${DisableX64FSRedirection}
-      ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\x86\PsExec.exe" -accepteula -s reg delete "$2" /f' "" ""
+      ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\x86\PsExec.exe" -accepteula -s reg delete "$2" /f' ""
       Pop $3
-      ExecDos::wait $3
-      Pop $4
       ${EnableX64FSRedirection}
     ${EndIf}
   ${Loop}
@@ -177,7 +173,7 @@ FunctionEnd
 !macro DeleteParticleDrivers
   DetailPrint "Looking for installed Particle drivers"
   ${DisableX64FSRedirection}
-  ExecDos::exec /TIMEOUT=2000 '"$INSTDIR\bin\$ARCH\$DEVCON" dp_enum' "" "$INSTDIR\oem.log"
+  ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\$ARCH\$DEVCON" dp_enum' "" "$INSTDIR\oem.log"
   Pop $0
   ${LineFind} "$INSTDIR\oem.log" "/NUL" "1:-1" "DeleteOemInf"
   ${EnableX64FSRedirection}
@@ -186,7 +182,7 @@ FunctionEnd
 !macro RescanDevices
   DetailPrint "Rescan connected devices"
   ${DisableX64FSRedirection}
-  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" rescan' "" ""
+  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" rescan' ""
   Pop $0
   ${EnableX64FSRedirection}
 !macroend
@@ -203,12 +199,8 @@ Function DeleteDevice
     ${StrTok} $2 $1 ":" "0" "1"
     ${Trim} $1 $2
     DetailPrint "Removing $1"
-    ${DisableX64FSRedirection}
-    ExecDos::exec /DETAILED /TIMEOUT=2000 '"$INSTDIR\bin\$ARCH\$DEVCON" remove "@$1"' "" ""
+    ExecDos::exec /DETAILED /TIMEOUT=2000 '"$INSTDIR\bin\$ARCH\$DEVCON" remove "@$1"' ""
     Pop $3
-    ExecDos::wait $3
-    Pop $4
-    ${EnableX64FSRedirection}
   ${EndIf}
   StrCpy $0 ""
   Push $0
@@ -219,19 +211,18 @@ Function DeleteOemInf
   ${If} $1 == $R9
     ; oemXXX.inf
     ; save in $R1
-    ${Trim} $R1 $1
+    ${Trim} $2 $1
+    StrCpy $R1 $2
   ${Else}
     ${Trim} $1 $R9
     ${StrStr} $2 $1 "Provider:"
-    ${If} $2 == "Provider: Particle" 
-    ${AndIf} $R1 != ""
-      DetailPrint "Deleting $R1"
-      ${DisableX64FSRedirection}
-      ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" -f dp_delete "$R1"' "" ""
-      Pop $3
-      ExecDos::wait $3
-      Pop $4
-      ${EnableX64FSRedirection}
+    ${If} $R1 != ""
+      ${If} $2 == "Provider: Particle" 
+      ${OrIf} $2 == "Provider: Sparklabs"
+        DetailPrint "Deleting $R1"
+        ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" -f dp_delete "$R1"' ""
+        Pop $3
+      ${EndIf}
     ${EndIf}
   ${EndIf}
   StrCpy $0 ""
@@ -271,7 +262,7 @@ Section "Particle Drivers" SecDrivers
 
   DetailPrint "Installing particle.inf"
   ${DisableX64FSRedirection}
-  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" dp_add "$INSTDIR\drivers\particle.inf"' "" ""
+  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" dp_add "$INSTDIR\drivers\particle.inf"' ""
   Pop $0
   ${EnableX64FSRedirection}
 
