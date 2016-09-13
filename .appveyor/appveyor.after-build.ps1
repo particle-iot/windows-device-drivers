@@ -18,4 +18,13 @@ cmd.exe /c "$sign $path\deploy\particle.cat" ;
 # Create a zip
 7z a windows-device-drivers.zip $path\deploy\* ;
 
+# Install ExecDos plugin for NSIS
+7z -y -o"${env:NSIS}" x $path\installer\plugins\ExecDos.zip "Plugins";
+
+# Create an installer
+$param = "/DPRODUCT_VERSION=${env:APPVEYOR_BUILD_VERSION}", "/DDRIVERSDIR=$path\deploy", "$path\installer\installer.nsi" ;
+& "${env:MAKENSIS}" $param ;
+# Sign
+cmd.exe /c "$sign $path\installer\particle_drivers_${env:APPVEYOR_BUILD_VERSION}.exe" ;
+
 exit

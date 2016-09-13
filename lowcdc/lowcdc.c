@@ -1,4 +1,3 @@
-
 /*++
 
 Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -112,11 +111,7 @@ Return Value:
     DriverObject->DriverExtension->AddDevice           = FilterAddDevice;
     DriverObject->DriverUnload                         = FilterUnload;
 
-	DriverObject->MajorFunction[IRP_MJ_INTERNAL_DEVICE_CONTROL] =
-		( RtlIsNtDdiVersionAvailable(NTDDI_VISTA) ||
-		( RtlIsNtDdiVersionAvailable(NTDDI_WINXP) &&
-		  RtlCheckRegistryKey(RTL_REGISTRY_SERVICES,USE_INTERRUPT)==STATUS_SUCCESS ) )?
-		FilterDispatchIoVista:FilterDispatchIoXp;
+	DriverObject->MajorFunction[IRP_MJ_INTERNAL_DEVICE_CONTROL] = FilterDispatchIoVista;
 
 	return status;
 }
@@ -756,6 +751,7 @@ Return Value:
     PURB                urb    = URB_FROM_IRP(Irp);
     NTSTATUS            status;
     static UCHAR        intr_addr;
+	static USBD_PIPE_HANDLE intr_handle;
     
 
     PAGED_CODE ();
@@ -832,7 +828,7 @@ Return Value:
     PURB                urb    = URB_FROM_IRP(Irp);
     NTSTATUS            status;
     static UCHAR        intr_addr;
-	static BOOLEAN		use_interrupt;
+	static USBD_PIPE_HANDLE intr_handle = 0;
     
  
 	PAGED_CODE ();
@@ -845,101 +841,23 @@ Return Value:
         return status;
     }
 
-    //    reform the configuration descripter
-    if( URB_FUNCTION_GET_DESCRIPTOR_FROM_DEVICE==urb->UrbHeader.Function &&
-        USB_CONFIGURATION_DESCRIPTOR_TYPE==urb->UrbControlDescriptorRequest.DescriptorType ) {
-        KEVENT        event;
-
-        KeInitializeEvent(&event, NotificationEvent, FALSE);
-
-        IoCopyCurrentIrpStackLocationToNext(Irp);
-
-        IoSetCompletionRoutine(Irp,
-                               (PIO_COMPLETION_ROUTINE) FilterStartCompletionRoutine,
-                               &event,
-                               TRUE,
-                               TRUE,
-                               TRUE
-                               );
-
-        status = IoCallDriver (deviceExtension->NextLowerDriver, Irp);
-
-        if (status == STATUS_PENDING) {
-           KeWaitForSingleObject(&event,
-                                 Executive,        // WaitReason
-                                 KernelMode,    // must be Kernelmode to prevent the stack getting paged out
-                                 FALSE,
-                                 NULL            // indefinite wait
-                                 );
-           status = Irp->IoStatus.Status;
-        }
-
-        if( NT_SUCCESS(status) &&
-            urb->UrbControlDescriptorRequest.TransferBuffer!=NULL &&
-            urb->UrbControlDescriptorRequest.TransferBufferLength<256 ) {
-            UCHAR    *pdsc, *ptr, *pend, *p0, *p1, buf[256];
-            ULONG    len;
-
-            //    swap the Communication/Data interface class descripters
-            pdsc    = urb->UrbControlDescriptorRequest.TransferBuffer;
-            len        = urb->UrbControlDescriptorRequest.TransferBufferLength;
-            memcpy( buf, pdsc, len );
-            p0    = NULL;
-            p1    = NULL;
-            for( ptr=buf,pend=ptr+len; ptr<pend; ptr+=*ptr ) {
-                if( *(ptr+1)==USB_INTERFACE_DESCRIPTOR_TYPE ) {
-                    if( *(ptr+5)==2 )			//    Communication Class
-                        p0    = ptr;
-                    else if( *(ptr+5)==10 )		//    Data Class
-                        p1    = ptr;
-                    if( p0!=NULL && p1!=NULL && p0<p1 ) {
-                        memcpy( pdsc+(p0-buf), p1, len-(p1-buf) );
-                        memcpy( pdsc+(len-(p1-p0)), p0, p1-p0 );
-
-                        DbgPrt(( DPFLTR_IHVBUS_ID, DBG_LEVEL,
-                            "[GET_CONFIGURATION_DESCRIPTOR]: interface class swapped. 0x%p\n", 
-                            Irp ));
-                        break;
-                    }
-                }
-            }
-        }
-
-        IoReleaseRemoveLock(&deviceExtension->RemoveLock, Irp);
-        return status;
-    }
-
-#define    MAX_NUMBER_OF_ENDPOINTS        8
-
-    //    deceive bulk pipes as the interrupt
     if( URB_FUNCTION_SELECT_CONFIGURATION==urb->UrbHeader.Function ) {
         USB_CONFIGURATION_DESCRIPTOR    *pdsc;
         UCHAR                           *ptr;
         UCHAR                           *pend;
-        int                             i, j, bulk_count = 0;
-        UCHAR                           bulk_addr[MAX_NUMBER_OF_ENDPOINTS];
+		int                             i, j;
 
         pdsc = urb->UrbSelectConfiguration.ConfigurationDescriptor;
 
-		use_interrupt	= RtlCheckRegistryKey(RTL_REGISTRY_SERVICES,USE_INTERRUPT)==STATUS_SUCCESS;
-		DbgPrt(( DPFLTR_IHVBUS_ID, DBG_LEVEL, " Vista/XP: %s\n", !use_interrupt ? "Bulk":"Interrupt" ));
-
-		//    replace bulk pipes to the interrupt
+		// Get interrupt endpoint number
         ptr    = (UCHAR *)pdsc;
         for( pend=ptr+pdsc->wTotalLength,ptr+=*ptr; ptr<pend; ptr+=*ptr ) {
             if( *(ptr+1)==USB_ENDPOINT_DESCRIPTOR_TYPE ) {
-                if( *(ptr+3)==USB_ENDPOINT_TYPE_BULK ) {
-                    *(ptr+3)    = USB_ENDPOINT_TYPE_INTERRUPT;
-					if( use_interrupt ) {
-						if( *(ptr+4)<8 )
-							*(ptr+4)    = 8;
-					}
-                    *(ptr+6)    = 10;
-                    if( bulk_count<MAX_NUMBER_OF_ENDPOINTS )
-                        bulk_addr[bulk_count++]    = *(ptr+2);
-                }
-                else if( *(ptr+3)==USB_ENDPOINT_TYPE_INTERRUPT )
-                    intr_addr   = *(ptr+2);
+				DbgPrt((DPFLTR_IHVBUS_ID, DBG_LEVEL, "Endpoint 0x%x\n", (int)*(ptr + 2)));
+				if (*(ptr + 3) == USB_ENDPOINT_TYPE_INTERRUPT) {
+					intr_addr = *(ptr + 2);
+					DbgPrt((DPFLTR_IHVBUS_ID, DBG_LEVEL, "Interrupt endpoint 0x%x\n", intr_addr));
+				}
             }
         }
 
@@ -947,44 +865,29 @@ Return Value:
 
         status = IoCallDriver (deviceExtension->NextLowerDriver, Irp);
 
-        if( NT_SUCCESS(status) && bulk_count ) {
+        if( NT_SUCCESS(status) && intr_addr) {
             USBD_INTERFACE_INFORMATION    *interface_info;
 
             interface_info = (USBD_INTERFACE_INFORMATION *)&urb->UrbSelectConfiguration.Interface;
             if( interface_info!=NULL ) {
-
+				DbgPrt((DPFLTR_IHVBUS_ID, DBG_LEVEL, "Number of pipes %d\n", (int)interface_info->NumberOfPipes));
                 for( i=0; i<(int)interface_info->NumberOfPipes; i++ ) {
                     USBD_PIPE_INFORMATION    *pipe_info = &interface_info->Pipes[i];
-
-                    //    retrieve the replaced endpoints
+                    //    retrieve interrupt pipe handle
                     if( pipe_info!=NULL ) {
-                        for( j=0; j<bulk_count; j++ ) {
-                            if( pipe_info->EndpointAddress==bulk_addr[j] ) {
-                                if(pipe_info->PipeHandle!=NULL) {
-									if( !use_interrupt ) {
-										UCHAR    *ph = (UCHAR *)pipe_info->PipeHandle;
-
-										if( *(ph+7)==UsbdPipeTypeInterrupt ) {
-											*(ph+7)     = UsbdPipeTypeBulk;
-											*(ph+10)    = 0;
-										}
-									}
-                                    pipe_info->PipeType    = UsbdPipeTypeBulk;    
-                                    pipe_info->Interval    = 0;    
-                                }
-                                break;
-                            }
-                        }
-
-                        DbgPrt(( DPFLTR_IHVBUS_ID, DBG_LEVEL,
-                            "[SELECT_CONFIGURATION]: (retrieved pipe) [%x-%x]-[%x-%x-%x-%x] IRP:0x%p\n",
-                            pipe_info->MaximumTransferSize,
-                            pipe_info->PipeFlags,
-                            pipe_info->MaximumPacketSize,
-                            pipe_info->EndpointAddress,
-                            pipe_info->Interval,
-                            pipe_info->PipeType,
-                            Irp ));
+						if (pipe_info->EndpointAddress == intr_addr) {
+							intr_handle = pipe_info->PipeHandle;
+							DbgPrt((DPFLTR_IHVBUS_ID, DBG_LEVEL,
+								"[Interrupt Pipe]: [%x-%x]-[%x-%x-%x-%x] handle=%x IRP:0x%p\n",
+								pipe_info->MaximumTransferSize,
+								pipe_info->PipeFlags,
+								pipe_info->MaximumPacketSize,
+								pipe_info->EndpointAddress,
+								pipe_info->Interval,
+								pipe_info->PipeType,
+								pipe_info->PipeHandle,
+								Irp));
+						}
                     }
                 }
             }
@@ -996,7 +899,8 @@ Return Value:
 
 	//  ignore unused interrupt request
     if( URB_FUNCTION_BULK_OR_INTERRUPT_TRANSFER==urb->UrbHeader.Function &&
-        *((UCHAR *)urb->UrbBulkOrInterruptTransfer.PipeHandle+6)==intr_addr ) {
+        urb->UrbBulkOrInterruptTransfer.PipeHandle==intr_handle && intr_handle) {
+		DbgPrt((DPFLTR_IHVBUS_ID, DBG_LEVEL, "Ignoring interrupt transfer to endpoint 0x%x\n", intr_handle));
 		IoSkipCurrentIrpStackLocation (Irp);
         Irp->IoStatus.Status = status	= STATUS_INTERNAL_ERROR;
         IoReleaseRemoveLock(&deviceExtension->RemoveLock, Irp); 
