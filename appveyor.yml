@@ -2,6 +2,8 @@ version: 6.1.0.{build}
 configuration: Release
 platform: All
 
+image: Visual Studio 2015
+
 environment:
   enc_secret:
     secure: iBAwCL/1SI3W95nhf1Bx9gbh+ORu8dsPBD7G4bFdRhU=  
