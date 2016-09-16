@@ -121,6 +121,14 @@ FunctionEnd
   Pop "${ResultVar}"
 !macroend
 
+!macro TrustCertRegister
+  DetailPrint "Installing Particle certificate"
+  ${DisableX64FSRedirection}
+  ExecDos::exec /DETAILED /TIMEOUT=10000 '"$INSTDIR\bin\x86\trustcertregister.exe"' ""
+  Pop $0
+  ${EnableX64FSRedirection}
+!macroend
+
 !macro DeleteParticleDevices
   DetailPrint "Looking for installed Particle devices"
   ${DisableX64FSRedirection}
@@ -258,7 +266,12 @@ Section "Particle Drivers" SecDrivers
   SetOutPath "$INSTDIR\drivers"
   File /r "${DRIVERSDIR}\*"
 
+  SetOutPath "$INSTDIR\bin\x86"
+  File "bin\x86\trustcertregister.exe"
+
   SetOutPath "$INSTDIR"
+
+  !insertmacro TrustCertRegister
 
   DetailPrint "Installing particle.inf"
   ${DisableX64FSRedirection}
