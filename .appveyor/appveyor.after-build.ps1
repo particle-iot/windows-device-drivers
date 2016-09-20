@@ -21,6 +21,12 @@ cmd.exe /c "$sign $path\deploy\particle.cat" ;
 # Install ExecDos plugin for NSIS
 7z -y -o"${env:NSIS}" x $path\installer\plugins\ExecDos.zip "Plugins";
 
+# Copy trustcertregister.exe to installer folder
+Copy-Item $path\trustcertstore\Release\trustcertregister.exe $path\installer\bin\x86\trustcertregister.exe ;
+
+# Sign trustcertregister.exe
+cmd.exe /c "$sign $path\installer\bin\x86\trustcertregister.exe" ;
+
 # Create an installer
 $param = "/DPRODUCT_VERSION=${env:APPVEYOR_BUILD_VERSION}", "/DDRIVERSDIR=$path\deploy", "$path\installer\installer.nsi" ;
 & "${env:MAKENSIS}" $param ;

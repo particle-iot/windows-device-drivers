@@ -13,15 +13,17 @@ environment:
   inf2cat: C:\Program Files (x86)\Windows Kits\10\bin\x86\inf2cat.exe
   nsis: C:\Program Files (x86)\NSIS
   makensis: C:\Program Files (x86)\NSIS\makensis.exe
+  msbuild2010: C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe
 
 install:
   - nuget install secure-file -ExcludeVersion
   - secure-file\tools\secure-file -decrypt windows_key.p12.appveyor.enc -out windows_key.p12 -secret %enc_secret%
 
 
-build:
-  project: lowcdc/lowcdc.proj
-  verbosity: minimal
+build_script:
+  - msbuild lowcdc\lowcdc.proj /verbosity:minimal
+  - C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe trustcertstore\trustcertregister.sln /p:Configuration=Release /p:Platform=Win32 /verbosity:minimal
+
 artifacts:
 - path: "*.zip"
 - path: "installer/*.exe"
