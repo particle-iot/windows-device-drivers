@@ -1,3 +1,5 @@
+https://ci.appveyor.com/api/projects/status/wqljs3lq4caneru3/branch/master?svg=true
+
 # Windows Drivers for Particle devices
 
 **NOTE: These drivers only support Particle Photon/P1/Electron firmware version >= 0.6.0 and Spark Core (no firmware version restriction)**
