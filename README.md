@@ -14,7 +14,7 @@ A basic outline of the installation steps:
   2. If the installer is being run on a machine with OS older than Windows XP, a message dialog is shown: _"The installer requires Windows XP or newer"_. The installer exits after the user clicks "OK" button.
 4. Installation directory `%TEMP%\particle-drivers-${version}` is deleted
 5. If the installer is being run in silent mode (i.e. `particle-drivers-${version}.exe /s`), a registry key `HKEY_LOCAL_MACHINE\Software\Particle\Drivers\Installed` is checked
-  1. If such key exists and has a `DWORD` value of `1` (meaning that are already installed), the installer silently exits.
+  1. If such key exists and has a `DWORD` value of `1` (meaning that the drivers are already installed), the installer silently exits.
 6. The installer presents the user with a "Components" selection
   1. "Uninstall current drivers" (selected by default)
     1. This section correctly cleans up any previous installations of drivers for Particle devices (USB VID=0x2B04 PID=0xCxxx)
