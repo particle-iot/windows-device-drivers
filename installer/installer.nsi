@@ -281,7 +281,7 @@ Section "Particle Drivers" SecDrivers
 
   !insertmacro RescanDevices
 
-  WriteRegDWORD HKLM "Software\Particle\Drivers" "Installed" 1
+  WriteRegStr HKLM "Software\Particle\Drivers" "Version" "${PRODUCT_VERSION}"
 SectionEnd
 
 ;--------------------------------
@@ -341,8 +341,8 @@ Function .onInit
   !insertmacro CleanInstDir
 
   ${If} ${Silent}
-    ReadRegDWORD $0 HKLM "Software\Particle\Drivers" "Installed"
-    ${If} $0 = 1
+    ReadRegStr $0 HKLM "Software\Particle\Drivers" "Version"
+    ${If} $0 == "${PRODUCT_VERSION}"
       ; If running silent, skip installation if already installed
       Abort
     ${EndIf}
@@ -351,8 +351,12 @@ FunctionEnd
 
 Function .onInstSuccess
   !insertmacro CleanInstDir
-  MessageBox MB_YESNO|MB_ICONQUESTION "Do you wish to reboot the system?" IDNO +2
-  Reboot
+  ${If} ${Silent}
+    ;
+  ${Else}
+    MessageBox MB_YESNO|MB_ICONQUESTION "Do you wish to reboot the system?" IDNO +2
+    Reboot
+  ${EndIf}
 FunctionEnd
 
 Function .onInstFailed
