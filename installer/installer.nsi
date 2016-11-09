@@ -351,8 +351,12 @@ FunctionEnd
 
 Function .onInstSuccess
   !insertmacro CleanInstDir
-  MessageBox MB_YESNO|MB_ICONQUESTION "Do you wish to reboot the system?" IDNO +2
-  Reboot
+  ${If} ${Silent}
+    ;
+  ${Else}
+    MessageBox MB_YESNO|MB_ICONQUESTION "Do you wish to reboot the system?" IDNO +2
+    Reboot
+  ${EndIf}
 FunctionEnd
 
 Function .onInstFailed
