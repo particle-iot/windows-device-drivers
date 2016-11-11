@@ -45,13 +45,13 @@
   !insertmacro MUI_PAGE_COMPONENTS
   ;!insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
-  
+
   ;!insertmacro MUI_UNPAGE_CONFIRM
   ;!insertmacro MUI_UNPAGE_INSTFILES
-  
+
 ;--------------------------------
 ;Languages
- 
+
   !insertmacro MUI_LANGUAGE "English"
 
 
@@ -76,13 +76,13 @@ ${StrTok}
 ; Trim
 ;   Removes leading & trailing whitespace from a string
 ; Usage:
-;   Push 
+;   Push
 ;   Call Trim
-;   Pop 
+;   Pop
 Function Trim
   Exch $R1 ; Original string
   Push $R2
- 
+
 Loop:
   StrCpy $R2 "$R1" 1
   StrCmp "$R2" " " TrimLeft
@@ -90,10 +90,10 @@ Loop:
   StrCmp "$R2" "$\n" TrimLeft
   StrCmp "$R2" "$\t" TrimLeft
   GoTo Loop2
-TrimLeft: 
+TrimLeft:
   StrCpy $R1 "$R1" "" 1
   Goto Loop
- 
+
 Loop2:
   StrCpy $R2 "$R1" 1 -1
   StrCmp "$R2" " " TrimRight
@@ -101,10 +101,10 @@ Loop2:
   StrCmp "$R2" "$\n" TrimRight
   StrCmp "$R2" "$\t" TrimRight
   GoTo Done
-TrimRight:  
+TrimRight:
   StrCpy $R1 "$R1" -1
   Goto Loop2
- 
+
 Done:
   Pop $R2
   Exch $R1
@@ -112,9 +112,9 @@ FunctionEnd
 
 ; Usage:
 ; ${Trim} $trimmedString $originalString
- 
+
 !define Trim "!insertmacro Trim"
- 
+
 !macro Trim ResultVar String
   Push "${String}"
   Call Trim
@@ -225,7 +225,7 @@ Function DeleteOemInf
     ${Trim} $1 $R9
     ${StrStr} $2 $1 "Provider:"
     ${If} $R1 != ""
-      ${If} $2 == "Provider: Particle" 
+      ${If} $2 == "Provider: Particle"
       ${OrIf} $2 == "Provider: Sparklabs"
         DetailPrint "Deleting $R1"
         ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" -f dp_delete "$R1"' ""
@@ -253,6 +253,14 @@ Section "Uninstall current drivers" SecCleanDrivers
   Call CleanUsbCache
 
   DeleteRegKey HKLM "Software\Particle\Drivers"
+
+  ${If} ${IsWin10}
+    ; We don't need any drivers on Win10, so force write 99999999 as version
+    WriteRegStr HKLM "Software\Particle\Drivers" "Version" "99999999"
+    ; Also write 99999999 into the registry value used by an old driver installer
+    ; so that it doesn't try to overwrite us
+    WriteRegDWORD HKLM "Software\Particle\drivers" "serial" 99999999
+  ${EndIf}
 SectionEnd
 
 Section "Particle Drivers" SecDrivers
@@ -282,6 +290,9 @@ Section "Particle Drivers" SecDrivers
   !insertmacro RescanDevices
 
   WriteRegStr HKLM "Software\Particle\Drivers" "Version" "${PRODUCT_VERSION}"
+  ; Also write 99999999 into the registry value used by an old driver installer
+  ; so that it doesn't try to overwrite us
+  WriteRegDWORD HKLM "Software\Particle\drivers" "serial" 99999999
 SectionEnd
 
 ;--------------------------------
@@ -296,7 +307,7 @@ SectionEnd
     !insertmacro MUI_DESCRIPTION_TEXT ${SecCleanDrivers} $(DESC_SecCleanDrivers)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecDrivers} $(DESC_SecDrivers)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
- 
+
 ;--------------------------------
 ;Uninstaller Section
 
@@ -322,7 +333,12 @@ Function .onInit
   ${If} ${IsWin10}
     !insertmacro SetSectionFlag ${SecDrivers} ${SF_RO}
     !insertmacro ClearSectionFlag ${SecDrivers} ${SF_SELECTED}
-    MessageBox MB_OK|MB_ICONEXCLAMATION "Particle devices don't require driver installation on Windows 10. If you installed Particle device drivers previously this installer can cleanly remove them." IDOK
+    ${IfNot} ${Silent}
+      MessageBox MB_OK|MB_ICONEXCLAMATION "Particle devices don't require driver installation on Windows 10. If you installed Particle device drivers previously this installer can cleanly remove them." IDOK
+    ${Else}
+      ; Automatically select SecCleanDrivers
+      !insertmacro SetSectionFlag ${SecCleanDrivers} ${SF_SELECTED}
+    ${EndIf}
   ${EndIf}
 
   ${If} ${AtLeastWinXP}
@@ -343,6 +359,7 @@ Function .onInit
   ${If} ${Silent}
     ReadRegStr $0 HKLM "Software\Particle\Drivers" "Version"
     ${If} $0 == "${PRODUCT_VERSION}"
+    ${OrIf} $0 == "99999999"
       ; If running silent, skip installation if already installed
       Abort
     ${EndIf}
@@ -351,9 +368,7 @@ FunctionEnd
 
 Function .onInstSuccess
   !insertmacro CleanInstDir
-  ${If} ${Silent}
-    ;
-  ${Else}
+  ${IfNot} ${Silent}
     MessageBox MB_YESNO|MB_ICONQUESTION "Do you wish to reboot the system?" IDNO +2
     Reboot
   ${EndIf}
