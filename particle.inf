@@ -38,6 +38,12 @@ CatalogFile=particle.cat
 ; Core
 %DEVICE_DESCRIPTION_CORE%=DriverInstall, USB\VID_1D50&PID_607D
 
+; Photon pre-0.6.0
+%DEVICE_DESCRIPTION_PHOTON_3%=DriverInstall, USB\VID_2B04&PID_C006&REV_0200
+; P1 pre-0.6.0
+%DEVICE_DESCRIPTION_P1_3%=DriverInstall, USB\VID_2B04&PID_C008&REV_0200
+; Electron pre-0.6.0
+%DEVICE_DESCRIPTION_ELECTRON_3%=DriverInstall, USB\VID_2B04&PID_C00A&REV_0200
 
 [DeviceList.NTia64] 
 ; Photon
@@ -55,6 +61,12 @@ CatalogFile=particle.cat
 ; Core
 %DEVICE_DESCRIPTION_CORE%=DriverInstall, USB\VID_1D50&PID_607D
 
+; Photon pre-0.6.0
+%DEVICE_DESCRIPTION_PHOTON_3%=DriverInstall, USB\VID_2B04&PID_C006&REV_0200
+; P1 pre-0.6.0
+%DEVICE_DESCRIPTION_P1_3%=DriverInstall, USB\VID_2B04&PID_C008&REV_0200
+; Electron pre-0.6.0
+%DEVICE_DESCRIPTION_ELECTRON_3%=DriverInstall, USB\VID_2B04&PID_C00A&REV_0200
 
 [DeviceList.NTamd64] 
 ; Photon
@@ -72,6 +84,12 @@ CatalogFile=particle.cat
 ; Core
 %DEVICE_DESCRIPTION_CORE%=DriverInstall, USB\VID_1D50&PID_607D
 
+; Photon pre-0.6.0
+%DEVICE_DESCRIPTION_PHOTON_3%=DriverInstall, USB\VID_2B04&PID_C006&REV_0200
+; P1 pre-0.6.0
+%DEVICE_DESCRIPTION_P1_3%=DriverInstall, USB\VID_2B04&PID_C008&REV_0200
+; Electron pre-0.6.0
+%DEVICE_DESCRIPTION_ELECTRON_3%=DriverInstall, USB\VID_2B04&PID_C00A&REV_0200
 
 [DeviceList.NTARM] 
 ; Photon
@@ -88,6 +106,13 @@ CatalogFile=particle.cat
 
 ; Core
 %DEVICE_DESCRIPTION_CORE%=DriverInstall, USB\VID_1D50&PID_607D
+
+; Photon pre-0.6.0
+%DEVICE_DESCRIPTION_PHOTON_3%=DriverInstall, USB\VID_2B04&PID_C006&REV_0200
+; P1 pre-0.6.0
+%DEVICE_DESCRIPTION_P1_3%=DriverInstall, USB\VID_2B04&PID_C008&REV_0200
+; Electron pre-0.6.0
+%DEVICE_DESCRIPTION_ELECTRON_3%=DriverInstall, USB\VID_2B04&PID_C00A&REV_0200
 
 ;------------------------------------------------------------------------------
 ; Files
@@ -187,10 +212,13 @@ ServiceBinary=%12%\lowcdc.sys
 PROVIDER="Particle"
 DEVICE_DESCRIPTION_PHOTON_1 ="Photon Serial"
 DEVICE_DESCRIPTION_PHOTON_2 ="Photon USBSerial1"
+DEVICE_DESCRIPTION_PHOTON_3 ="Photon Serial"
 DEVICE_DESCRIPTION_P1_1 ="P1 Serial"
 DEVICE_DESCRIPTION_P1_2 ="P1 USBSerial1"
+DEVICE_DESCRIPTION_P1_3 ="P1 Serial"
 DEVICE_DESCRIPTION_ELECTRON_1 = "Electron Serial"
 DEVICE_DESCRIPTION_ELECTRON_2 = "Electron USBSerial1"
+DEVICE_DESCRIPTION_ELECTRON_3 = "Electron Serial"
 DEVICE_DESCRIPTION_CORE ="Spark Core Serial"
 USBSER.DESC = "USB Serial Driver"
 LOWCDC.DESC = "lowcdc driver"
