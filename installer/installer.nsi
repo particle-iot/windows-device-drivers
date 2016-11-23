@@ -121,6 +121,13 @@ FunctionEnd
   Pop "${ResultVar}"
 !macroend
 
+!macro MsvcRedist2010
+  ${DisableX64FSRedirection}
+  ExecDos::exec /DETAILED /TIMEOUT=10000 '"$INSTDIR\bin\x86\vcredist_x86.exe" /q /norestart' ""
+  Pop $0
+  ${EnableX64FSRedirection}
+!macroend
+
 !macro TrustCertRegister
   DetailPrint "Installing Particle certificate"
   ${DisableX64FSRedirection}
@@ -275,10 +282,12 @@ Section "Particle Drivers" SecDrivers
   File /r "${DRIVERSDIR}\*"
 
   SetOutPath "$INSTDIR\bin\x86"
+  File "bin\x86\vcredist_x86.exe"
   File "bin\x86\trustcertregister.exe"
 
   SetOutPath "$INSTDIR"
 
+  !insertmacro MsvcRedist2010
   !insertmacro TrustCertRegister
 
   DetailPrint "Installing particle.inf"
