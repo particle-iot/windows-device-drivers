@@ -234,6 +234,7 @@ Function DeleteOemInf
     ${If} $R1 != ""
       ${If} $2 == "Provider: Particle"
       ${OrIf} $2 == "Provider: Sparklabs"
+      ${OrIf} $2 == "Provider: libwdi"
         DetailPrint "Deleting $R1"
         ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" -f dp_delete "$R1"' ""
         Pop $3
