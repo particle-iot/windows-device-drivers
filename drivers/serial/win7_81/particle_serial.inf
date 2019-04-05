@@ -166,7 +166,7 @@ CopyFiles=DriverInstall.CopyFiles
 AddReg=DriverInstall.AddReg
 
 [DriverInstall.CopyFiles]
-usbser.sys,,,0x20
+; usbser.sys,,,0x20
 
 [DriverInstall.HW]
 AddReg=DriverInstall.HW.AddReg
@@ -192,7 +192,7 @@ CopyFiles=DriverInstallLowcdc.CopyFiles
 AddReg=DriverInstallLowcdc.AddReg
 
 [DriverInstallLowcdc.CopyFiles]
-usbser.sys,,,0x20
+; usbser.sys,,,0x20
 lowcdc.sys
 
 [DriverInstallLowcdc.HW]
