@@ -1,0 +1,3 @@
+This installer installs the drivers needed to interact with Particle devices over USB.
+
+NOTE: Before proceding with installation, it's best if there are no Particle devices connected to your computer.

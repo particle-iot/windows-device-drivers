@@ -1,28 +1,47 @@
+Unicode true
+
+Var /GLOBAL ARCH
+Var /GLOBAL DEVCON
+Var /GLOBAL INSTALL_STATE
+
 !include "MUI2.nsh"
 !include "WinVer.nsh"
 !include "x64.nsh"
 !include "LogicLib.nsh"
 !include "TextFunc.nsh"
 !include "StrFunc.nsh"
+!include "WordFunc.nsh"
+
+!addincludedir "include"
+!include "trim.nsh"
+
+; Enable these functions
+${StrStr}
+${StrTok}
+${StrLoc}
+${StrCase}
+
+!include "utils.nsh"
+!include "drivers.nsh"
 
 ;--------------------------------
 ;General
 
-  ;Request application privileges for Windows Vista
+  ; Request application privileges for Windows Vista
   RequestExecutionLevel highest
 
   !define MUI_ICON "resources\particle.ico"
 
   !define PRODUCT_NAME "Particle Device Drivers"
   !ifndef PRODUCT_VERSION
-    !define PRODUCT_VERSION "6.1.0.0"
+    !define PRODUCT_VERSION "1.0.0.0"
   !endif
   !define PRODUCT_PUBLISHER "Particle"
   !define PRODUCT_WEBSITE "http://particle.io"
 
   ;Name and file
-  Name "${PRODUCT_NAME} ${PRODUCT_VERSION} Installer"
-  OutFile "particle_drivers_${PRODUCT_VERSION}.exe"
+  Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
+  OutFile "particle_device_drivers_${PRODUCT_VERSION}.exe"
 
   ;Default installation folder
   InstallDir "$TEMP\particle_drivers_${PRODUCT_VERSION}"
@@ -41,7 +60,15 @@
 ;--------------------------------
 ;Pages
 
-  ;!insertmacro MUI_PAGE_LICENSE "${NSISDIR}\Docs\Modern UI\License.txt"
+  ; Welcome page
+  !define MUI_WELCOMEFINISHPAGE_BITMAP "resources\particle.bmp"
+  !define MUI_WELCOMEPAGE_TITLE "Install ${PRODUCT_NAME}"
+  !define /file MUI_WELCOMEPAGE_TEXT "resources\welcome.txt"
+  !insertmacro MUI_PAGE_WELCOME
+
+  ; License page
+  !insertmacro MUI_PAGE_LICENSE "resources\license.txt"
+  ; Components page
   !insertmacro MUI_PAGE_COMPONENTS
   ;!insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
@@ -53,7 +80,6 @@
 ;Languages
 
   !insertmacro MUI_LANGUAGE "English"
-
 
   VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${PRODUCT_NAME}"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" ""
@@ -67,183 +93,6 @@
 ;--------------------------------
 ;Installer Sections
 
-Var /GLOBAL ARCH
-Var /GLOBAL DEVCON
-
-${StrStr}
-${StrTok}
-
-; Trim
-;   Removes leading & trailing whitespace from a string
-; Usage:
-;   Push
-;   Call Trim
-;   Pop
-Function Trim
-  Exch $R1 ; Original string
-  Push $R2
-
-Loop:
-  StrCpy $R2 "$R1" 1
-  StrCmp "$R2" " " TrimLeft
-  StrCmp "$R2" "$\r" TrimLeft
-  StrCmp "$R2" "$\n" TrimLeft
-  StrCmp "$R2" "$\t" TrimLeft
-  GoTo Loop2
-TrimLeft:
-  StrCpy $R1 "$R1" "" 1
-  Goto Loop
-
-Loop2:
-  StrCpy $R2 "$R1" 1 -1
-  StrCmp "$R2" " " TrimRight
-  StrCmp "$R2" "$\r" TrimRight
-  StrCmp "$R2" "$\n" TrimRight
-  StrCmp "$R2" "$\t" TrimRight
-  GoTo Done
-TrimRight:
-  StrCpy $R1 "$R1" -1
-  Goto Loop2
-
-Done:
-  Pop $R2
-  Exch $R1
-FunctionEnd
-
-; Usage:
-; ${Trim} $trimmedString $originalString
-
-!define Trim "!insertmacro Trim"
-
-!macro Trim ResultVar String
-  Push "${String}"
-  Call Trim
-  Pop "${ResultVar}"
-!macroend
-
-!macro MsvcRedist2010
-  ${DisableX64FSRedirection}
-  ExecDos::exec /DETAILED /TIMEOUT=10000 '"$INSTDIR\bin\x86\vcredist_x86.exe" /q /norestart' ""
-  Pop $0
-  ${EnableX64FSRedirection}
-!macroend
-
-!macro TrustCertRegister
-  DetailPrint "Installing Particle certificate"
-  ${DisableX64FSRedirection}
-  ExecDos::exec /DETAILED /TIMEOUT=10000 '"$INSTDIR\bin\x86\trustcertregister.exe"' ""
-  Pop $0
-  ${EnableX64FSRedirection}
-!macroend
-
-!macro DeleteParticleDevices
-  DetailPrint "Looking for installed Particle devices"
-  ${DisableX64FSRedirection}
-  ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\$ARCH\$DEVCON" findall USB\VID_2B04&PID_C0*' "" "$INSTDIR\usbdevs.log"
-  Pop $0
-  ${LineFind} "$INSTDIR\usbdevs.log" "/NUL" "1:-1" "DeleteDevice"
-  ${EnableX64FSRedirection}
-!macroend
-
-Function CleanUsbCache
-  DetailPrint "Cleaning USB driver cache"
-  StrCpy $0 0
-  ${Do}
-    EnumRegKey $1 HKLM "SYSTEM\CurrentControlSet\Enum\USB" $0
-    ${If} $1 == ""
-      ${ExitDo}
-    ${EndIf}
-    IntOp $0 $0 + 1
-    ${StrStr} $2 $1 "VID_2B04&PID_C0"
-    ${If} $2 != ""
-      StrCpy $2 "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USB\$1"
-      DetailPrint "Removing from registry $2"
-      ${DisableX64FSRedirection}
-      ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\x86\PsExec.exe" -accepteula -s reg delete "$2" /f' ""
-      Pop $3
-      ${EnableX64FSRedirection}
-    ${EndIf}
-  ${Loop}
-
-  StrCpy $0 0
-  ${Do}
-    EnumRegKey $1 HKLM "SYSTEM\CurrentControlSet\Control\usbflags" $0
-    ${If} $1 == ""
-      ${ExitDo}
-    ${EndIf}
-    IntOp $0 $0 + 1
-    ${StrStr} $2 $1 "2B04C0"
-    ${If} $2 != ""
-      StrCpy $2 "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\usbflags\$1"
-      DetailPrint "Removing from registry $2"
-      ${DisableX64FSRedirection}
-      ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\x86\PsExec.exe" -accepteula -s reg delete "$2" /f' ""
-      Pop $3
-      ${EnableX64FSRedirection}
-    ${EndIf}
-  ${Loop}
-
-FunctionEnd
-
-!macro DeleteParticleDrivers
-  DetailPrint "Looking for installed Particle drivers"
-  ${DisableX64FSRedirection}
-  ExecDos::exec /TIMEOUT=10000 '"$INSTDIR\bin\$ARCH\$DEVCON" dp_enum' "" "$INSTDIR\oem.log"
-  Pop $0
-  ${LineFind} "$INSTDIR\oem.log" "/NUL" "1:-1" "DeleteOemInf"
-  ${EnableX64FSRedirection}
-!macroend
-
-!macro RescanDevices
-  DetailPrint "Rescan connected devices"
-  ${DisableX64FSRedirection}
-  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" rescan' ""
-  Pop $0
-  ${EnableX64FSRedirection}
-!macroend
-
-
-!macro CleanInstDir
-  SetOutPath "$TEMP"
-  RMDir /r "$INSTDIR"
-!macroend
-
-Function DeleteDevice
-  ${StrStr} $1 $R9 "USB"
-  ${If} $1 == $R9
-    ${StrTok} $2 $1 ":" "0" "1"
-    ${Trim} $1 $2
-    DetailPrint "Removing $1"
-    ExecDos::exec /DETAILED /TIMEOUT=2000 '"$INSTDIR\bin\$ARCH\$DEVCON" remove "@$1"' ""
-    Pop $3
-  ${EndIf}
-  StrCpy $0 ""
-  Push $0
-FunctionEnd
-
-Function DeleteOemInf
-  ${StrStr} $1 $R9 "oem"
-  ${If} $1 == $R9
-    ; oemXXX.inf
-    ; save in $R1
-    ${Trim} $2 $1
-    StrCpy $R1 $2
-  ${Else}
-    ${Trim} $1 $R9
-    ${StrStr} $2 $1 "Provider:"
-    ${If} $R1 != ""
-      ${If} $2 == "Provider: Particle"
-      ${OrIf} $2 == "Provider: Sparklabs"
-        DetailPrint "Deleting $R1"
-        ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" -f dp_delete "$R1"' ""
-        Pop $3
-      ${EndIf}
-    ${EndIf}
-  ${EndIf}
-  StrCpy $0 ""
-  Push $0
-FunctionEnd
-
 Section "Uninstall current drivers" SecCleanDrivers
   UserInfo::GetAccountType
   Pop $1
@@ -252,22 +101,17 @@ Section "Uninstall current drivers" SecCleanDrivers
     Abort "This installer needs to be run with administrative privileges"
   ${EndIf}
 
-  SetOutPath "$INSTDIR"
+  SetOutPath "$PLUGINSDIR"
   File /r bin
+  SetOutPath "$INSTDIR"
 
+  ; Yes, we are deleting the drivers twice
+  !insertmacro DeleteParticleDrivers
   !insertmacro DeleteParticleDevices
   !insertmacro DeleteParticleDrivers
   Call CleanUsbCache
 
   DeleteRegKey HKLM "Software\Particle\Drivers"
-
-  ${If} ${IsWin10}
-    ; We don't need any drivers on Win10, so force write 99999999 as version
-    WriteRegStr HKLM "Software\Particle\Drivers" "Version" "99999999"
-    ; Also write 99999999 into the registry value used by an old driver installer
-    ; so that it doesn't try to overwrite us
-    WriteRegDWORD HKLM "Software\Particle\drivers" "serial" 99999999
-  ${EndIf}
 SectionEnd
 
 Section "Particle Drivers" SecDrivers
@@ -278,10 +122,10 @@ Section "Particle Drivers" SecDrivers
     Abort "This installer needs to be run with administrative privileges"
   ${EndIf}
 
-  SetOutPath "$INSTDIR\drivers"
+  SetOutPath "$PLUGINSDIR\drivers"
   File /r "${DRIVERSDIR}\*"
 
-  SetOutPath "$INSTDIR\bin\x86"
+  SetOutPath "$PLUGINSDIR\bin\x86"
   File "bin\x86\vcredist_x86.exe"
   File "bin\x86\trustcertregister.exe"
 
@@ -289,19 +133,16 @@ Section "Particle Drivers" SecDrivers
 
   !insertmacro MsvcRedist2010
   !insertmacro TrustCertRegister
-
-  DetailPrint "Installing particle.inf"
-  ${DisableX64FSRedirection}
-  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$INSTDIR\bin\$ARCH\$DEVCON" dp_add "$INSTDIR\drivers\particle.inf"' ""
-  Pop $0
-  ${EnableX64FSRedirection}
+  !insertmacro InstallDrivers
 
   !insertmacro RescanDevices
 
-  WriteRegStr HKLM "Software\Particle\Drivers" "Version" "${PRODUCT_VERSION}"
-  ; Also write 99999999 into the registry value used by an old driver installer
-  ; so that it doesn't try to overwrite us
+  WriteRegStr HKLM "Software\Particle\Drivers" "Version2" "${PRODUCT_VERSION}"
+  ; Also write bogus large version number into the registry value used by an old driver installers
+  ; so that they will not try to overwrite us
+  ; FIXME: do we still need this?
   WriteRegDWORD HKLM "Software\Particle\drivers" "serial" 99999999
+  WriteRegStr HKLM "Software\Particle\Drivers" "Version" "99.99.99.99"
 SectionEnd
 
 ;--------------------------------
@@ -309,7 +150,7 @@ SectionEnd
 
   ;Language strings
   LangString DESC_SecCleanDrivers ${LANG_ENGLISH} "Uninstalls any previously installed Particle drivers."
-  LangString DESC_SecDrivers ${LANG_ENGLISH} "USB CDC (Serial) drivers for Photon, Electron, P1 and Core."
+  LangString DESC_SecDrivers ${LANG_ENGLISH} "USB drivers for Particle devices."
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -339,50 +180,47 @@ Function .onInit
   ${Else}
     StrCpy $ARCH "x86"
   ${EndIf}
-  ${If} ${IsWin10}
-    !insertmacro SetSectionFlag ${SecDrivers} ${SF_RO}
-    !insertmacro ClearSectionFlag ${SecDrivers} ${SF_SELECTED}
-    ${IfNot} ${Silent}
-      MessageBox MB_OK|MB_ICONEXCLAMATION "Particle devices don't require driver installation on Windows 10. If you installed Particle device drivers previously this installer can cleanly remove them." IDOK
-    ${Else}
-      ; Automatically select SecCleanDrivers
-      !insertmacro SetSectionFlag ${SecCleanDrivers} ${SF_SELECTED}
-    ${EndIf}
-  ${EndIf}
 
-  ${If} ${AtLeastWinXP}
+  ${If} ${AtLeastWin7}
     ; ok
   ${Else}
-    MessageBox MB_OK|MB_ICONEXCLAMATION "The installer requires Windows XP or newer" IDOK
+    MessageBox MB_OK|MB_ICONEXCLAMATION "The installer requires at least Windows 7" IDOK
     Abort
   ${EndIf}
 
-  ${If} ${AtMostWinXP}
-    StrCpy $DEVCON "devcon_xp.exe"
+  StrCpy $DEVCON "devcon.exe"
+
+  ReadRegStr $0 HKLM "Software\Particle\Drivers" "Version2"
+  ${If} $0 != ""
+    ${VersionCompare} $0 "${PRODUCT_VERSION}" $1
+    ${If} $1 <> 2
+      StrCpy $INSTALL_STATE "installed"
+    ${Else}
+      StrCpy $INSTALL_STATE "update"
+    ${EndIf}
   ${Else}
-    StrCpy $DEVCON "devcon.exe"
+    StrCpy $INSTALL_STATE "clean"
   ${EndIf}
 
-  !insertmacro CleanInstDir
-
   ${If} ${Silent}
-    ReadRegStr $0 HKLM "Software\Particle\Drivers" "Version"
-    ${If} $0 == "${PRODUCT_VERSION}"
-    ${OrIf} $0 == "99999999"
-      ; If running silent, skip installation if already installed
+    ${If} $INSTALL_STATE == "installed"
+      ; If running silent, skip installation if already installed and the installed
+      ; version equals or is greater than ${PRODUCT_VERSION}
       Abort
     ${EndIf}
+  ${EndIf}
+
+  ${If} $INSTALL_STATE == "clean"
+    !insertmacro SetSectionFlag ${SecCleanDrivers} ${SF_RO}
+  ${Else}
+    !insertmacro ClearSectionFlag ${SecCleanDrivers} ${SF_SELECTED}
   ${EndIf}
 FunctionEnd
 
 Function .onInstSuccess
-  !insertmacro CleanInstDir
-  ${IfNot} ${Silent}
-    MessageBox MB_YESNO|MB_ICONQUESTION "Do you wish to reboot the system?" IDNO +2
-    Reboot
-  ${EndIf}
+  ; !insertmacro CleanInstDir
 FunctionEnd
 
 Function .onInstFailed
-  !insertmacro CleanInstDir
+  ; !insertmacro CleanInstDir
 FunctionEnd
