@@ -36,7 +36,7 @@ $arg = "aes-256-cbc", "-k", "${env:encryption_secret}", "-in", "$path\cert\parti
         "$path\cert\particle-code-signing-cert.p12", "-d", "-a";
 & ${openssl} $arg;
 
-$sign = "sign", "/v", "/f", "$path\cert\particle-code-signing-cert.p12", "/p", "${env:key_secret}";
+$sign = "sign", "/v", "/ac", "$path\cert\comodorsacertificationauthority_kmod.crt", "/f", "$path\cert\particle-code-signing-cert.p12", "/p", "${env:key_secret}", "/tr", "http://timestamp.comodoca.com/rfc3161";
 
 # Sign serial drivers for Windows 10
 & $signtool ($sign + "$path\deploy\serial\win10\particle_serial.cat");
