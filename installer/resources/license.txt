@@ -1,7 +1,7 @@
 Licenses
 ================================================
 devcon: a command-line tool that displays detailed information about devices, and lets you search for and manipulate devices from the command line.
-https://github.com/Microsoft/Windows-driver-samplescc
+https://github.com/Microsoft/Windows-driver-samples
 
 The Microsoft Public License (MS-PL)
 Copyright (c) 2015 Microsoft
@@ -29,7 +29,7 @@ This license governs use of the accompanying software. If you use the software, 
 
 ================================================
 PaExec: a free, redistributable and open source equivalent to Microsoft's popular PsExec application.
-https://github.com/poweradminllc/PAExecc
+https://github.com/poweradminllc/PAExec
 
 PAEXEC SOFTWARE LICENSE TERMS
 
