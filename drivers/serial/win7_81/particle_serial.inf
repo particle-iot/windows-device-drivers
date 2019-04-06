@@ -145,11 +145,11 @@ CatalogFile=particle_serial.cat
 DefaultDestDir=12
 
 [SourceDisksFiles.x86]
-lowcdc.sys=1, x86
+lowcdc_particle.sys=1, x86
 usbser.sys=3426, x86
 
 [SourceDisksFiles.amd64]
-lowcdc.sys=1, amd64
+lowcdc_particle.sys=1, amd64
 usbser.sys=3426, amd64
 
 [SourceDisksNames]
@@ -193,7 +193,7 @@ AddReg=DriverInstallLowcdc.AddReg
 
 [DriverInstallLowcdc.CopyFiles]
 ; usbser.sys,,,0x20
-lowcdc.sys
+lowcdc_particle.sys
 
 [DriverInstallLowcdc.HW]
 AddReg=DriverInstallLowcdc.HW.AddReg
@@ -228,7 +228,7 @@ DisplayName=%LOWCDC.DESC%
 ServiceType=1
 StartType=3
 ErrorControl=1
-ServiceBinary=%12%\lowcdc.sys
+ServiceBinary=%12%\lowcdc_particle.sys
 
 ;------------------------------------------------------------------------------
 ;  String Definitions
