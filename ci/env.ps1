@@ -78,3 +78,13 @@ if (-not (Test-Path env:INSTALLER_OUTPUT_DIR)) {
         $installer_output_dir = (Join-Path -Path (Get-Location) -ChildPath ${env:INSTALLER_OUTPUT_DIR});
     }
 }
+
+if (-not (Test-Path env:WDK_REDIST)) {
+    if (Test-Path env:WDKContentRoot) {
+        $wdk_redist = "${env:WDKContentRoot}\redist";
+    } else {
+        $wdk_redist = "C:\Program Files (x86)\Windows Kits\10\redist";
+    }
+} else {
+    $wdl_redist = ${env:WDK_REDIST};
+}

@@ -21,6 +21,14 @@ mkdir $path\deploy\serial\win7_81\amd64;
 cp $path\lowcdc\Release\x86\lowcdc.sys $path\deploy\serial\win7_81\x86\lowcdc_particle.sys;
 cp $path\lowcdc\Release\amd64\lowcdc.sys $path\deploy\serial\win7_81\amd64\lowcdc_particle.sys;
 
+# Copy WinUSB co-installers from Windows Driver Kit
+mkdir $path\deploy\dfu\x86;
+mkdir $path\deploy\dfu\amd64;
+cp $wdk_redist\wdf\x86\WinUsbCoInstaller2.dll $path\deploy\dfu\x86;
+cp $wdk_redist\wdf\x86\WdfCoInstaller01011.dll $path\deploy\dfu\x86;
+cp $wdk_redist\wdf\x64\WinUsbCoInstaller2.dll $path\deploy\dfu\amd64;
+cp $wdk_redist\wdf\x64\WdfCoInstaller01011.dll $path\deploy\dfu\amd64;
+
 # Decrypt signing certificate/key
 $arg = "aes-256-cbc", "-k", "${env:encryption_secret}", "-in", "$path\cert\particle-code-signing-cert.p12.enc", "-out",
         "$path\cert\particle-code-signing-cert.p12", "-d", "-a";

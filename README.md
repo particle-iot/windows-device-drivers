@@ -28,6 +28,7 @@ The installer and the drivers in this repository use the following third-party c
 2. [PaExec](https://github.com/poweradminllc/PAExec): a free, redistributable and open source equivalent to Microsoft's popular PsExec application.
 3. [lowcdc](http://www.recursion.jp/prose/avrcdc/driver.html): CDC class driver implementation for low-speed USB
 4. trustcertregister: a part of [libwdi](https://github.com/pbatard/libwdi) Windows Driver Installer library for USB devices
+5. WinUSB co-installers from Windows Driver Kit
 
 See [license.txt](/installer/resources/license.txt) for full information about licenses of these components.
 
