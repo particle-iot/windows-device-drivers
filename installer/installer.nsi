@@ -1,6 +1,7 @@
 Unicode true
 
 Var /GLOBAL ARCH
+Var /GLOBAL ARCH_WIN
 Var /GLOBAL DEVCON
 Var /GLOBAL INSTALL_STATE
 
@@ -131,7 +132,7 @@ Section "Particle Drivers" SecDrivers
 
   SetOutPath "$INSTDIR"
 
-  !insertmacro MsvcRedist2010
+  !insertmacro MsvcRedist
   !insertmacro TrustCertRegister
   !insertmacro InstallDrivers
 
@@ -176,9 +177,11 @@ SectionEnd
 Function .onInit
   ${If} ${RunningX64}
     StrCpy $ARCH "amd64"
+    StrCpy $ARCH_WIN "x64"
     SetRegView 64
   ${Else}
     StrCpy $ARCH "x86"
+    StrCpy $ARCH_WIN "x86"
   ${EndIf}
 
   ${If} ${AtLeastWin7}

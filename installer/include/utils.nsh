@@ -1,9 +1,9 @@
 !ifndef __PARTICLE_UTILS_NSH__
 !define __PARTICLE_UTILS_NSH__
 
-!macro MsvcRedist2010
+!macro MsvcRedist
   ${DisableX64FSRedirection}
-  ExecDos::exec /DETAILED /TIMEOUT=10000 '"$PLUGINSDIR\bin\x86\vcredist_x86.exe" /q /norestart' ""
+  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$PLUGINSDIR\bin\$ARCH\vcredist_$ARCH_WIN.exe" /q /norestart' ""
   Pop $0
   ${EnableX64FSRedirection}
 !macroend
@@ -11,7 +11,7 @@
 !macro TrustCertRegister
   DetailPrint "Installing Particle certificate"
   ${DisableX64FSRedirection}
-  ExecDos::exec /DETAILED /TIMEOUT=10000 '"$PLUGINSDIR\bin\x86\trustcertregister.exe"' ""
+  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$PLUGINSDIR\bin\x86\trustcertregister.exe"' ""
   Pop $0
   ${EnableX64FSRedirection}
 !macroend
