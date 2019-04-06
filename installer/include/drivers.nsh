@@ -243,7 +243,8 @@ Function LookIntoOemInf
   DetailPrint "Looking into $R1"
   ${DisableX64FSRedirection}
   ; This is needed to be able to read UTF-16 files :|
-  ExecDos::exec 'cmd.exe /C "type $WINDIR\inf\$R1"' "" "$PLUGINSDIR\$R1"
+  ; Only looking at lines with 'VID_'
+  ExecDos::exec 'cmd.exe /C "type $WINDIR\inf\$R1 | findstr VID_"' "" "$PLUGINSDIR\$R1"
   Pop $0
   ${LineFind} "$PLUGINSDIR\$R1" "/NUL" "1:-1" "MatchParticleVidPidInOemInf"
   ${EnableX64FSRedirection}
