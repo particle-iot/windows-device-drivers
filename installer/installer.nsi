@@ -1,4 +1,5 @@
 Unicode true
+!addplugindir "${EXTPLUGINSDIR}\x86-unicode"
 
 Var /GLOBAL ARCH
 Var /GLOBAL ARCH_WIN
@@ -42,7 +43,7 @@ ${StrCase}
 
   ;Name and file
   Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-  OutFile "particle_device_drivers_${PRODUCT_VERSION}.exe"
+  OutFile "particle_drivers.exe"
 
   ;Default installation folder
   InstallDir "$TEMP\particle_drivers_${PRODUCT_VERSION}"
