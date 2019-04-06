@@ -71,5 +71,10 @@ if (Test-Path env:SETUP_BUILD_ENV) {
 if (-not (Test-Path env:INSTALLER_OUTPUT_DIR)) {
     $installer_output_dir = "$path/installer";
 } else {
-    $installer_output_dir = ${env:INSTALLER_OUTPUT_DIR};
+    # Deal with relative paths as well
+    if ([System.IO.Path]::IsPathRooted(${env:INSTALLER_OUTPUT_DIR})) {
+        $installer_output_dir = ${env:INSTALLER_OUTPUT_DIR};
+    } else {
+        $installer_output_dir = (Join-Path -Path (Get-Location) -ChildPath ${env:INSTALLER_OUTPUT_DIR});
+    }
 }
