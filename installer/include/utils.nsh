@@ -4,7 +4,7 @@
 !macro MsvcRedist
   DetailPrint "Installing MSVC redist"
   ${DisableX64FSRedirection}
-  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$PLUGINSDIR\bin\$ARCH\vcredist_$ARCH_WIN.exe" /install /passive /norestart' ""
+  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$PLUGINSDIR\bin\$ARCH\vcredist_$ARCH_WIN.exe" /q /install /passive /norestart' ""
   Pop $0
   ${EnableX64FSRedirection}
 !macroend
