@@ -1,5 +1,11 @@
+. "$PSScriptRoot\env.ps1";
+
 # Get build path
-$path = $env:APPVEYOR_BUILD_FOLDER;
+if (-not (Test-Path env:APPVEYOR_BUILD_FOLDER)) {
+    $path = Get-Location;
+} else {
+    $path = $env:APPVEYOR_BUILD_FOLDER;
+}
 # Create deploy folder
 mkdir $path\deploy;
 # Copy driver inf files preserving directory structure
@@ -14,7 +20,9 @@ cmd.exe /c "`"${env:INF2CAT}`" /v /driver:$path\deploy\serial\win7_81 /os:6_3_X8
 # inf2cat dfu drivers for all Windows versions
 cmd.exe /c "`"${env:INF2CAT}`" /v /driver:$path\deploy\dfu /os:10_X86,10_X64,Server10_X64,6_3_X86,6_3_X64,Server6_3_X64,8_X64,8_X86,Server8_X64,Server2008R2_X64,7_X64,7_X86,Server2008_X64,Server2008_X86";
 
-$sign = "`"${env:SIGNTOOL}`"  sign /v /ac AddTrust_External_CA_Root.cer /f windows_key.p12 /p %key_secret% /tr http://tsa.starfieldtech.com";
+# TODO: decrypt key
+
+$sign = "`"${env:SIGNTOOL}`"  sign /v /ac cert\AddTrust_External_CA_Root.cer /f cert\particle-code-signing-cert.p12 /p %key_secret% /tr http://tsa.starfieldtech.com";
 
 # Sign serial drivers for Windows 10
 cmd.exe /c "$sign $path\deploy\serial\win10\particle_serial.cat" ;
