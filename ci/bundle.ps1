@@ -67,9 +67,7 @@ Copy-Item $path\devcon\x64\Release\devcon.exe $path\installer\bin\amd64\devcon.e
 & $signtool ($sign + "$path\installer\bin\amd64\devcon.exe");
 
 # Create an installer
-$arg = "/DDRIVERSDIR=$path\deploy", "/DEXTPLUGINSDIR=$path\deploy\nsis\Plugins", "$path\installer\installer.nsi" ;
+$arg = "/DDRIVERSDIR=$path\deploy", "/DEXTPLUGINSDIR=$path\deploy\nsis\Plugins", "/DOUTPUT_DIR=$installer_output_dir", "$path\installer\installer.nsi" ;
 & ${makensis} $arg ;
 # Sign
 & $signtool ($sign + "$path\installer\particle_drivers.exe");
-
-exit

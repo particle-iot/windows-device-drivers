@@ -67,3 +67,9 @@ function Invoke-CmdScript {
 if (Test-Path env:SETUP_BUILD_ENV) {
     Invoke-CmdScript ${env:SETUP_BUILD_ENV}
 }
+
+if (-not (Test-Path env:INSTALLER_OUTPUT_DIR)) {
+    $installer_output_dir = "$path/installer";
+} else {
+    $installer_output_dir = ${env:INSTALLER_OUTPUT_DIR};
+}

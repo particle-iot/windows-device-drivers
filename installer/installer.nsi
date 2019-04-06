@@ -43,7 +43,12 @@ ${StrCase}
 
   ;Name and file
   Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-  OutFile "particle_drivers.exe"
+  !ifndef OUTPUT_DIR
+    !define OUTPUT_FILE "particle_drivers.exe"
+  !else
+    !define OUTPUT_FILE "${OUTPUT_DIR}/particle_drivers.exe"
+  !endif
+  OutFile "${OUTPUT_FILE}"
 
   ;Default installation folder
   InstallDir "$TEMP\particle_drivers_${PRODUCT_VERSION}"
