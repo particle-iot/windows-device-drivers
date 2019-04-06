@@ -112,10 +112,12 @@ Section "Uninstall current drivers" SecCleanDrivers
   File /r bin
   SetOutPath "$INSTDIR"
 
-  ; Yes, we are deleting the drivers twice
-  !insertmacro DeleteParticleDrivers
+  !insertmacro MsvcRedist
+
+  ; Yes, we are deleting devices twice
   !insertmacro DeleteParticleDevices
   !insertmacro DeleteParticleDrivers
+  !insertmacro DeleteParticleDevices
   Call CleanUsbCache
 
   DeleteRegKey HKLM "Software\Particle\Drivers"
