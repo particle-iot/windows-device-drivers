@@ -15,8 +15,11 @@ rm -Recurse -Force deploy
 mkdir $path\deploy;
 # Copy driver inf files preserving directory structure
 robocopy $path\drivers $path\deploy /s ;
-# Copy *.sys files from Release folder preserving directory structure
-robocopy $path\lowcdc\Release $path\deploy\serial\win7_81 *.sys /s ;
+# Copy lowcdc.sys files from Release folder
+mkdir $path\deploy\serial\win7_81\x86;
+mkdir $path\deploy\serial\win7_81\amd64;
+cp $path\lowcdc\Release\x86\lowcdc.sys $path\deploy\serial\win7_81\x86;
+cp $path\lowcdc\Release\amd64\lowcdc.sys $path\deploy\serial\win7_81\amd64;
 
 # inf2cat serial drivers for Windows 10
 $arg = "/v", "/driver:$path\deploy\serial\win10", "/os:10_X86,10_X64,Server10_X64";
@@ -49,8 +52,7 @@ $sign = "sign", "/v", "/f", "$path\cert\particle-code-signing-cert.p12", "/p", "
 # & $7zip $arg;
 
 # Install ExecDos plugin for NSIS
-mkdir $path\deploy\nsis;
-$arg = "-y", "-o`"$path\deploy\nsis`"", "x", "$path\installer\plugins\ExecDos.zip", '"Plugins"';
+$arg = "-y", "-o`"$path\installer`"", "x", "$path\installer\plugins\ExecDos.zip", '"Plugins"';
 & $7zip $arg;
 
 # Copy trustcertregister.exe to installer folder
@@ -69,7 +71,7 @@ Copy-Item $path\devcon\x64\Release\devcon.exe $path\installer\bin\amd64\devcon.e
 & $signtool ($sign + "$path\installer\bin\amd64\devcon.exe");
 
 # Create an installer
-$arg = "/DDRIVERSDIR=$path\deploy", "/DEXTPLUGINSDIR=$path\deploy\nsis\Plugins", "/DOUTPUT_DIR=$installer_output_dir", "$path\installer\installer.nsi" ;
+$arg = "/DDRIVERSDIR=$path\deploy", "/DEXTPLUGINSDIR=$path\installer\Plugins", "/DOUTPUT_DIR=$installer_output_dir", "$path\installer\installer.nsi" ;
 & ${makensis} $arg ;
 # Sign
 & $signtool ($sign + "$installer_output_dir\particle_drivers.exe");
