@@ -29,8 +29,8 @@ $arg = "aes-256-cbc", "-k", "${env:encryption_secret}", "-in", "$path\cert\parti
 $sign = "sign", "/v", "/ac", "$path\cert\comodorsacertificationauthority_kmod.crt", "/f", "$path\cert\particle-code-signing-cert.p12", "/p", "${env:key_secret}", "/tr", "http://timestamp.comodoca.com/rfc3161";
 
 # Sign lowcdc.sys drivers for Windows 7 to Windows 8.1
-& $signtool ($sign + ("/fd", "sha256") + "$path\deploy\serial\win7_81\x86\lowcdc_particle.sys");
-& $signtool ($sign + ("/fd", "sha256") + "$path\deploy\serial\win7_81\amd64\lowcdc_particle.sys");
+& $signtool ($sign + "$path\deploy\serial\win7_81\x86\lowcdc_particle.sys");
+& $signtool ($sign + "$path\deploy\serial\win7_81\amd64\lowcdc_particle.sys");
 
 # inf2cat serial drivers for Windows 10
 $arg = "/v", "/driver:$path\deploy\serial\win10", "/os:10_X86,10_X64,Server10_X64";
@@ -45,7 +45,7 @@ $arg = "/v", "/driver:$path\deploy\dfu", "/os:10_X86,10_X64,Server10_X64,6_3_X86
 # Sign serial drivers for Windows 10
 & $signtool ($sign + "$path\deploy\serial\win10\particle_serial.cat");
 # Sign serial drivers for Windows 7 to Windows 8.1
-& $signtool ($sign + ("/fd", "sha256") + "$path\deploy\serial\win7_81\particle_serial.cat");
+& $signtool ($sign + "$path\deploy\serial\win7_81\particle_serial.cat");
 # Sign DFU drivers for all Windows versions
 & $signtool ($sign + "$path\deploy\dfu\particle_dfu.cat");
 
