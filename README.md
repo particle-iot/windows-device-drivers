@@ -31,6 +31,21 @@ The installer and the drivers in this repository use the following third-party c
 
 See [license.txt](/installer/resources/license.txt) for full information about licenses of these components.
 
+## Building
+
+### Prerequisites
+
+1. Microsoft Visual Studio 2017
+2. Windows Driver Kit 10.0
+3. 7zip
+4. Nullsoft NSIS 3
+5. OpenSSL
+
+## Scripts
+
+1. `ci/build.ps1`
+2. `ci/bundle.ps`
+
 ## License
 
 Copyright 2019 © Particle Industries, Inc. Licensed under the Apache 2 license.
