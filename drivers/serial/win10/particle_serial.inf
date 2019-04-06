@@ -143,16 +143,10 @@ CatalogFile=particle_serial.cat
 
 [DestinationDirs]
 DefaultDestDir=12
-
-[SourceDisksFiles.x86]
-usbser.sys=3426, x86
-
-[SourceDisksFiles.amd64]
-usbser.sys=3426, amd64
+FakeModemCopyFileSection=12
 
 [SourceDisksNames]
 1=%SourceName%
-3426=windows cd
 
 ;------------------------------------------------------------------------------
 ; Standard CDC
@@ -160,11 +154,8 @@ usbser.sys=3426, amd64
 
 [DriverInstall]
 include=mdmcpq.inf
-CopyFiles=DriverInstall.CopyFiles
+CopyFiles=FakeModemCopyFileSection
 AddReg=DriverInstall.AddReg
-
-[DriverInstall.CopyFiles]
-; usbser.sys,,,0x20
 
 [DriverInstall.HW]
 AddReg=DriverInstall.HW.AddReg

@@ -142,19 +142,17 @@ CatalogFile=particle_serial.cat
 ;------------------------------------------------------------------------------
 
 [DestinationDirs]
+FakeModemCopyFileSection=12
 DefaultDestDir=12
 
 [SourceDisksFiles.x86]
 lowcdc_particle.sys=1, x86
-usbser.sys=3426, x86
 
 [SourceDisksFiles.amd64]
 lowcdc_particle.sys=1, amd64
-usbser.sys=3426, amd64
 
 [SourceDisksNames]
 1=%SourceName%
-3426=windows cd
 
 ;------------------------------------------------------------------------------
 ; Standard CDC
@@ -162,11 +160,8 @@ usbser.sys=3426, amd64
 
 [DriverInstall]
 include=mdmcpq.inf
-CopyFiles=DriverInstall.CopyFiles
+CopyFiles=FakeModemCopyFileSection
 AddReg=DriverInstall.AddReg
-
-[DriverInstall.CopyFiles]
-; usbser.sys,,,0x20
 
 [DriverInstall.HW]
 AddReg=DriverInstall.HW.AddReg
@@ -188,11 +183,10 @@ AddService=usbser, 0x00000002, UsbserService
 
 [DriverInstallLowcdc]
 include=mdmcpq.inf
-CopyFiles=DriverInstallLowcdc.CopyFiles
+CopyFiles=FakeModemCopyFileSection,DriverInstallLowcdc.CopyFiles
 AddReg=DriverInstallLowcdc.AddReg
 
 [DriverInstallLowcdc.CopyFiles]
-; usbser.sys,,,0x20
 lowcdc_particle.sys
 
 [DriverInstallLowcdc.HW]
@@ -205,11 +199,11 @@ HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
 HKR,,NTMPDriver,,*ntkern
 HKR,,NTMPDriver,,usbser.sys
 HKR,,PortSubClass,1,01
-HKR,,LowerFilters, 0x00010000, "lowcdc"
+HKR,,LowerFilters, 0x00010000, "lowcdc_particle"
 
 [DriverInstallLowcdc.Services]
 AddService=usbser, 0x00000002, UsbserService
-AddService=lowcdc, 0x00000000, LowcdcService
+AddService=lowcdc_particle, 0x00000000, LowcdcService
 
 ;------------------------------------------------------------------------------
 ;  Usbser Service
@@ -273,6 +267,6 @@ DEVICE_DESCRIPTION_ARGON_SOM_1 = "Argon SoM Serial"
 DEVICE_DESCRIPTION_BORON_SOM_1 = "Boron SoM Serial"
 
 USBSER.DESC = "USB Serial Driver"
-LOWCDC.DESC = "lowcdc driver"
+LOWCDC.DESC = "Particle lowcdc driver"
 
 SourceName = "Particle Driver Source"
