@@ -11,7 +11,7 @@
 !macro TrustCertRegister
   DetailPrint "Installing Particle certificate"
   ${DisableX64FSRedirection}
-  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$PLUGINSDIR\bin\x86\trustcertregister.exe"' ""
+  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$PLUGINSDIR\bin\$ARCH\trustcertregister.exe"' ""
   Pop $0
   ${EnableX64FSRedirection}
 !macroend

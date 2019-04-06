@@ -55,9 +55,11 @@ $arg = "-y", "-o`"$path\deploy\nsis`"", "x", "$path\installer\plugins\ExecDos.zi
 
 # Copy trustcertregister.exe to installer folder
 Copy-Item $path\trustcertstore\Release\trustcertregister.exe $path\installer\bin\x86\trustcertregister.exe ;
+Copy-Item $path\trustcertstore\x64\Release\trustcertregister.exe $path\installer\bin\amd64\trustcertregister.exe ;
 
 # Sign trustcertregister.exe
 & $signtool ($sign + "$path\installer\bin\x86\trustcertregister.exe");
+& $signtool ($sign + "$path\installer\bin\amd64\trustcertregister.exe");
 
 # Copy devcon to installer folder
 Copy-Item $path\devcon\Release\devcon.exe $path\installer\bin\x86\devcon.exe ;

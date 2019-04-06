@@ -134,10 +134,8 @@ Section "Particle Drivers" SecDrivers
   SetOutPath "$PLUGINSDIR\drivers"
   File /r "${DRIVERSDIR}\*"
 
-  SetOutPath "$PLUGINSDIR\bin\x86"
-  File "bin\x86\vcredist_x86.exe"
-  File "bin\x86\trustcertregister.exe"
-
+  SetOutPath "$PLUGINSDIR"
+  File /r bin
   SetOutPath "$INSTDIR"
 
   !insertmacro MsvcRedist
