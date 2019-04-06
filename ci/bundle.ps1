@@ -33,7 +33,7 @@ $arg = "aes-256-cbc", "-k", "${env:encryption_secret}", "-in", "$path\cert\parti
         "$path\cert\particle-code-signing-cert.p12", "-d", "-a";
 & ${openssl} $arg;
 
-$sign = "sign", "/v", "/ac", "$path\cert\AddTrust_External_CA_Root.cer", "/f", "$path\cert\particle-code-signing-cert.p12", "/p", "${env:key_secret}";
+$sign = "sign", "/v", "/f", "$path\cert\particle-code-signing-cert.p12", "/p", "${env:key_secret}";
 
 # Sign serial drivers for Windows 10
 & $signtool ($sign + "$path\deploy\serial\win10\particle_serial.cat");
