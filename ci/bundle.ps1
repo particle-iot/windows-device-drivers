@@ -9,12 +9,6 @@ if (-not (Test-Path env:encryption_secret)) {
     Exit 1
 }
 
-# Get build path
-if (-not (Test-Path env:APPVEYOR_BUILD_FOLDER)) {
-    $path = Get-Location;
-} else {
-    $path = $env:APPVEYOR_BUILD_FOLDER;
-}
 # Clean deploy folder
 rm -Recurse -Force deploy
 # Create deploy folder

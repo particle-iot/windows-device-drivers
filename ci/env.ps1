@@ -40,3 +40,10 @@ if (-not (Test-Path env:OPENSSL)) {
 } else {
     $openssl = ${env:OPENSSL};
 }
+
+# Get build path
+if (-not (Test-Path env:APPVEYOR_BUILD_FOLDER)) {
+    $path = "$PSScriptRoot\..\";
+} else {
+    $path = $env:APPVEYOR_BUILD_FOLDER;
+}
