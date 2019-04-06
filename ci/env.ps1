@@ -47,3 +47,23 @@ if (-not (Test-Path env:APPVEYOR_BUILD_FOLDER)) {
 } else {
     $path = $env:APPVEYOR_BUILD_FOLDER;
 }
+
+# Invokes a Cmd.exe shell script and updates the environment. 
+# from https://stackoverflow.com/questions/42535773/setting-variables-for-batch-files-in-powershell
+function Invoke-CmdScript {
+  param(
+    [String] $scriptName
+  )
+  $cmdLine = """$scriptName"" $args & set"
+  & $Env:SystemRoot\system32\cmd.exe /c $cmdLine |
+    Select-String '^([^=]*)=(.*)$' | ForEach-Object {
+      $varName = $_.Matches[0].Groups[1].Value
+      $varValue = $_.Matches[0].Groups[2].Value
+      Set-Item Env:$varName $varValue
+    }
+}
+
+# Setup custom build environment
+if (Test-Path env:SETUP_BUILD_ENV) {
+    Invoke-CmdScript ${env:SETUP_BUILD_ENV}
+}
