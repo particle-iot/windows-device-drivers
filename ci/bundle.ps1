@@ -49,6 +49,20 @@ $arg = "/v", "/driver:$path\deploy\dfu", "/os:10_X86,10_X64,Server10_X64,6_3_X86
 # Sign DFU drivers for all Windows versions
 & $signtool ($sign + "$path\deploy\dfu\particle_dfu.cat");
 
+# Verify signatures for Windows 7 - Windows 8.1 serial drivers
+$arg = "verify", "/v", "/kp", "/c", "$path\deploy\serial\win7_81\particle_serial.cat", "$path\deploy\serial\win7_81\amd64\lowcdc.sys";
+& $signtool $arg;
+$arg = "verify", "/v", "/pa", "/c", "$path\deploy\serial\win7_81\particle_serial.cat", "$path\deploy\serial\win7_81\amd64\lowcdc.sys";
+& $signtool $arg;
+$arg = "verify", "/v", "/c", "$path\deploy\serial\win7_81\particle_serial.cat", "$path\deploy\serial\win7_81\amd64\lowcdc.sys";
+& $signtool $arg;
+$arg = "verify", "/v", "/kp", "/c", "$path\deploy\serial\win7_81\particle_serial.cat", "$path\deploy\serial\win7_81\x86\lowcdc.sys";
+& $signtool $arg;
+$arg = "verify", "/v", "/pa", "/c", "$path\deploy\serial\win7_81\particle_serial.cat", "$path\deploy\serial\win7_81\x86\lowcdc.sys";
+& $signtool $arg;
+$arg = "verify", "/v", "/c", "$path\deploy\serial\win7_81\particle_serial.cat", "$path\deploy\serial\win7_81\x86\lowcdc.sys";
+& $signtool $arg;
+
 # Create a zip
 # $arg = "a", "windows-device-drivers.zip", "$path\deploy\*";
 # & $7zip $arg;
