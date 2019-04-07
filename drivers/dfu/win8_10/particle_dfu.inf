@@ -1,5 +1,5 @@
 ; -----------------------------------------------------------------------------
-; Windows 10 USB DFU Setup File for Particle devices:
+; Windows 8 to Windows 10 USB DFU Setup File for Particle devices:
 ;
 ; Gen 1:
 ; - Core
@@ -11,6 +11,7 @@
 ; - Xenon (pre-0.9.0)
 ; - Argon (pre-0.9.0)
 ; - Boron (pre-0.9.0)
+; Gen 3 SoMs: WCID-only
 ;
 ; For all the other DeviceOS versions we rely on WCID
 ; -----------------------------------------------------------------------------
@@ -105,40 +106,12 @@ KmdfLibraryVersion=1.11
 [Dev_AddReg]
 HKR,,DeviceInterfaceGUIDs,0x10000,"{37fb5f90-1a34-4929-933b-8a27e1850033}"
 
-[USB_Install.CoInstallers]
-AddReg=CoInstallers_AddReg
-CopyFiles=CoInstallers_CopyFiles
-
-[CoInstallers_AddReg]
-HKR,,CoInstallers32,0x00010000,"WdfCoInstaller01011.dll,WdfCoInstaller","WinUsbCoInstaller2.dll"
-
-[CoInstallers_CopyFiles]
-WinUsbCoInstaller2.dll
-WdfCoInstaller01011.dll
-
-[DestinationDirs]
-CoInstallers_CopyFiles=11
-
-; ================= Source Media Section =====================
-
-[SourceDisksNames]
-1 = %DiskName%
-
-[SourceDisksFiles.x86]
-WinUsbCoInstaller2.dll=1, x86
-WdfCoInstaller01011.dll=1, x86
-
-[SourceDisksFiles.amd64]
-WinUsbCoInstaller2.dll=1, amd64
-WdfCoInstaller01011.dll=1, amd64
-
 ; =================== Strings ===================
 
 [Strings]
 ManufacturerName="Particle"
 ClassName="Universal Serial Bus devices"
 REG_MULTI_SZ = 0x00010000
-DiskName="Particle Driver Source"
 
 ; Gen 1
 DEVICE_DESCRIPTION_CORE = "Core DFU Mode"

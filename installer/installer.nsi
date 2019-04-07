@@ -139,7 +139,6 @@ Section "Particle Drivers" SecDrivers
   SetOutPath "$INSTDIR"
 
   !insertmacro MsvcRedist
-  !insertmacro TrustCertRegister
   !insertmacro InstallDrivers
 
   !insertmacro RescanDevices

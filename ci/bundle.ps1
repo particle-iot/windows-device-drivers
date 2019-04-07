@@ -21,13 +21,19 @@ mkdir $path\deploy\serial\win7_81\amd64;
 cp $path\lowcdc\Release\x86\lowcdc.sys $path\deploy\serial\win7_81\x86\lowcdc_particle.sys;
 cp $path\lowcdc\Release\amd64\lowcdc.sys $path\deploy\serial\win7_81\amd64\lowcdc_particle.sys;
 
-# Copy WinUSB co-installers from Windows Driver Kit
-mkdir $path\deploy\dfu\x86;
-mkdir $path\deploy\dfu\amd64;
-cp $wdk_redist\wdf\x86\WinUsbCoInstaller2.dll $path\deploy\dfu\x86;
-cp $wdk_redist\wdf\x86\WdfCoInstaller01011.dll $path\deploy\dfu\x86;
-cp $wdk_redist\wdf\x64\WinUsbCoInstaller2.dll $path\deploy\dfu\amd64;
-cp $wdk_redist\wdf\x64\WdfCoInstaller01011.dll $path\deploy\dfu\amd64;
+# Copy WinUSB co-installers from Windows Driver Kit to Windows 7 DFU and Control Interface drivers
+mkdir $path\deploy\dfu\win7\x86;
+mkdir $path\deploy\dfu\win7\amd64;
+cp $wdk_redist\wdf\x86\WinUsbCoInstaller2.dll $path\deploy\dfu\win7\x86;
+cp $wdk_redist\wdf\x86\WdfCoInstaller01011.dll $path\deploy\dfu\win7\x86;
+cp $wdk_redist\wdf\x64\WinUsbCoInstaller2.dll $path\deploy\dfu\win7\amd64;
+cp $wdk_redist\wdf\x64\WdfCoInstaller01011.dll $path\deploy\dfu\win7\amd64;
+mkdir $path\deploy\control\win7\x86;
+mkdir $path\deploy\control\win7\amd64;
+cp $wdk_redist\wdf\x86\WinUsbCoInstaller2.dll $path\deploy\control\win7\x86;
+cp $wdk_redist\wdf\x86\WdfCoInstaller01011.dll $path\deploy\control\win7\x86;
+cp $wdk_redist\wdf\x64\WinUsbCoInstaller2.dll $path\deploy\control\win7\amd64;
+cp $wdk_redist\wdf\x64\WdfCoInstaller01011.dll $path\deploy\control\win7\amd64;
 
 # Decrypt signing certificate/key
 $arg = "aes-256-cbc", "-k", "${env:encryption_secret}", "-in", "$path\cert\particle-code-signing-cert.p12.enc", "-out",
@@ -46,16 +52,26 @@ $arg = "/v", "/driver:$path\deploy\serial\win10", "/os:10_X86,10_X64,Server10_X6
 # inf2cat serial drivers for Windows 7 to Windows 8.1
 $arg = "/v", "/driver:$path\deploy\serial\win7_81", "/os:6_3_X86,6_3_X64,Server6_3_X64,8_X64,8_X86,Server8_X64,Server2008R2_X64,7_X64,7_X86,Server2008_X64,Server2008_X86";
 & ${inf2cat} $arg;
-# inf2cat dfu drivers for all Windows versions
-$arg = "/v", "/driver:$path\deploy\dfu", "/os:10_X86,10_X64,Server10_X64,6_3_X86,6_3_X64,Server6_3_X64,8_X64,8_X86,Server8_X64,Server2008R2_X64,7_X64,7_X86,Server2008_X64,Server2008_X86";
+# inf2cat dfu drivers for Windows 7
+$arg = "/v", "/driver:$path\deploy\dfu\win7", "/os:Server2008R2_X64,7_X64,7_X86,Server2008_X64,Server2008_X86";
+& ${inf2cat} $arg;
+# inf2cat dfu drivers for Windows 8 - Windows 10
+$arg = "/v", "/driver:$path\deploy\dfu\win8_10", "/os:10_X86,10_X64,Server10_X64,6_3_X86,6_3_X64,Server6_3_X64,8_X64,8_X86,Server8_X64";
+& ${inf2cat} $arg;
+# inf2cat Control Interface drivers for Windows 7
+$arg = "/v", "/driver:$path\deploy\control\win7", "/os:Server2008R2_X64,7_X64,7_X86,Server2008_X64,Server2008_X86";
 & ${inf2cat} $arg;
 
 # Sign serial drivers for Windows 10
 & $signtool ($sign + "$path\deploy\serial\win10\particle_serial.cat");
 # Sign serial drivers for Windows 7 to Windows 8.1
 & $signtool ($sign + "$path\deploy\serial\win7_81\particle_serial.cat");
-# Sign DFU drivers for all Windows versions
-& $signtool ($sign + "$path\deploy\dfu\particle_dfu.cat");
+# Sign DFU drivers for Windows 7
+& $signtool ($sign + "$path\deploy\dfu\win7\particle_dfu.cat");
+# Sign DFU drivers for Windows 8 to Windows 10
+& $signtool ($sign + "$path\deploy\dfu\win8_10\particle_dfu.cat");
+# Sign Control Interface drivers for Windows 7
+& $signtool ($sign + "$path\deploy\control\win7\particle_control.cat");
 
 # Verify signatures for Windows 7 - Windows 8.1 serial drivers
 $arg = "verify", "/v", "/kp", "/c", "$path\deploy\serial\win7_81\particle_serial.cat", "$path\deploy\serial\win7_81\amd64\lowcdc_particle.sys";
@@ -78,14 +94,6 @@ $arg = "verify", "/v", "/c", "$path\deploy\serial\win7_81\particle_serial.cat", 
 # Install ExecDos plugin for NSIS
 $arg = "-y", "-o`"$path\installer`"", "x", "$path\installer\plugins\ExecDos.zip", '"Plugins"';
 & $7zip $arg;
-
-# Copy trustcertregister.exe to installer folder
-Copy-Item $path\trustcertstore\Release\trustcertregister.exe $path\installer\bin\x86\trustcertregister.exe ;
-Copy-Item $path\trustcertstore\x64\Release\trustcertregister.exe $path\installer\bin\amd64\trustcertregister.exe ;
-
-# Sign trustcertregister.exe
-& $signtool ($sign + "$path\installer\bin\x86\trustcertregister.exe");
-& $signtool ($sign + "$path\installer\bin\amd64\trustcertregister.exe");
 
 # Copy devcon to installer folder
 Copy-Item $path\devcon\Release\devcon.exe $path\installer\bin\x86\devcon.exe ;

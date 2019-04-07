@@ -1,0 +1,190 @@
+; -----------------------------------------------------------------------------
+; Windows 7 USB DFU Setup File for Particle devices:
+;
+; WCID doesn't work really well on Windows 7, so we are manually attaching
+; WinUSB driver to DFU interfaces.
+;
+; Gen 1:
+; - Core
+; Gen 2:
+; - Photon
+; - P1
+; - Electron
+; Gen 3:
+; - Xenon
+; - Argon
+; - Boron
+; Gen 3 SoMs:
+; - Xenon SoM
+; - Argon SoM
+; - Boron SoM
+;
+; -----------------------------------------------------------------------------
+
+[Version]
+Signature = "$Windows NT$"
+Class     = USBDevice
+ClassGUID = {88BAE032-5A81-49f0-BC3D-A4FF138216D6}
+Provider  = %ManufacturerName%
+CatalogFile = particle_dfu.cat
+DriverVer = 04/04/2019,1.0.0.0
+
+; ========== Manufacturer/Models sections ===========
+
+[Manufacturer]
+%ManufacturerName% = Standard,NTamd64,NTx86
+
+[Standard.NTx86]
+; Core
+%DEVICE_DESCRIPTION_CORE%=USB_Install, USB\VID_1D50&PID_607F
+
+; Photon
+%DEVICE_DESCRIPTION_PHOTON%=USB_Install, USB\VID_2B04&PID_D006
+
+; P1
+%DEVICE_DESCRIPTION_P1%=USB_Install, USB\VID_2B04&PID_D008
+
+; Electron
+%DEVICE_DESCRIPTION_ELECTRON%=USB_Install, USB\VID_2B04&PID_D00A
+
+; Xenon
+%DEVICE_DESCRIPTION_XENON%=USB_Install, USB\VID_2B04&PID_D00E
+
+; Argon
+%DEVICE_DESCRIPTION_ARGON%=USB_Install, USB\VID_2B04&PID_D00C
+
+; Boron
+%DEVICE_DESCRIPTION_BORON%=USB_Install, USB\VID_2B04&PID_D00D
+
+; Xenon SoM
+%DEVICE_DESCRIPTION_XENON_SOM%=DriverInstall, USB\VID_2B04&PID_D018
+
+; Argon SoM
+%DEVICE_DESCRIPTION_ARGON_SOM%=DriverInstall, USB\VID_2B04&PID_D016
+
+; Boron SoM
+%DEVICE_DESCRIPTION_BORON_SOM%=DriverInstall, USB\VID_2B04&PID_D017
+
+[Standard.NTamd64]
+; Core
+%DEVICE_DESCRIPTION_CORE%=USB_Install, USB\VID_1D50&PID_607F
+
+; Photon
+%DEVICE_DESCRIPTION_PHOTON%=USB_Install, USB\VID_2B04&PID_D006
+
+; P1
+%DEVICE_DESCRIPTION_P1%=USB_Install, USB\VID_2B04&PID_D008
+
+; Electron
+%DEVICE_DESCRIPTION_ELECTRON%=USB_Install, USB\VID_2B04&PID_D00A
+
+; Xenon
+%DEVICE_DESCRIPTION_XENON%=USB_Install, USB\VID_2B04&PID_D00E
+
+; Argon
+%DEVICE_DESCRIPTION_ARGON%=USB_Install, USB\VID_2B04&PID_D00C
+
+; Boron
+%DEVICE_DESCRIPTION_BORON%=USB_Install, USB\VID_2B04&PID_D00D
+
+; Xenon SoM
+%DEVICE_DESCRIPTION_XENON_SOM%=DriverInstall, USB\VID_2B04&PID_D018
+
+; Argon SoM
+%DEVICE_DESCRIPTION_ARGON_SOM%=DriverInstall, USB\VID_2B04&PID_D016
+
+; Boron SoM
+%DEVICE_DESCRIPTION_BORON_SOM%=DriverInstall, USB\VID_2B04&PID_D017
+
+
+; ========== Class definition (for Windows 8 and ealier versions)===========
+
+[ClassInstall32]
+AddReg = ClassInstall_AddReg
+
+[ClassInstall_AddReg]
+HKR,,,,%ClassName%
+HKR,,NoInstallClass,,1
+HKR,,IconPath,%REG_MULTI_SZ%,"%%systemroot%%\system32\setupapi.dll,-20"
+HKR,,LowerLogoVersion,,5.2
+
+; =================== Installation ===================
+
+[USB_Install]
+Include = winusb.inf
+Needs   = WINUSB.NT
+
+[USB_Install.Services]
+Include = winusb.inf
+Needs   = WINUSB.NT.Services
+
+[USB_Install.HW]
+AddReg=Dev_AddReg
+
+[USB_Install.Wdf]
+KmdfService=WINUSB, WinUsb_Install
+
+[WinUsb_Install]
+KmdfLibraryVersion=1.11
+
+[Dev_AddReg]
+HKR,,DeviceInterfaceGUIDs,0x10000,"{37fb5f90-1a34-4929-933b-8a27e1850033}"
+
+[USB_Install.CoInstallers]
+AddReg=CoInstallers_AddReg
+CopyFiles=CoInstallers_CopyFiles
+
+[CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"WdfCoInstaller01011.dll,WdfCoInstaller","WinUsbCoInstaller2.dll"
+
+[CoInstallers_CopyFiles]
+WinUsbCoInstaller2.dll
+WdfCoInstaller01011.dll
+
+[DestinationDirs]
+CoInstallers_CopyFiles=11
+
+; ================= Source Media Section =====================
+
+[SourceDisksNames]
+1 = %DiskName%
+
+[SourceDisksFiles.x86]
+WinUsbCoInstaller2.dll=1, x86
+WdfCoInstaller01011.dll=1, x86
+
+[SourceDisksFiles.amd64]
+WinUsbCoInstaller2.dll=1, amd64
+WdfCoInstaller01011.dll=1, amd64
+
+; =================== Strings ===================
+
+[Strings]
+ManufacturerName="Particle"
+ClassName="Universal Serial Bus devices"
+REG_MULTI_SZ = 0x00010000
+DiskName="Particle Driver Source"
+
+; Gen 1
+DEVICE_DESCRIPTION_CORE = "Core DFU Mode"
+; Gen 2
+; Photon
+DEVICE_DESCRIPTION_PHOTON ="Photon DFU Mode"
+; P1
+DEVICE_DESCRIPTION_P1 ="P1 DFU Mode"
+; Electron
+DEVICE_DESCRIPTION_ELECTRON = "Electron DFU Mode"
+; Gen3
+; Xenon
+DEVICE_DESCRIPTION_XENON = "Xenon DFU Mode"
+; Argon
+DEVICE_DESCRIPTION_ARGON = "Argon DFU Mode"
+; Boron
+DEVICE_DESCRIPTION_BORON = "Boron DFU Mode"
+; Gen3 SoMs
+; Xenon SoM
+DEVICE_DESCRIPTION_XENON = "Xenon SoM DFU Mode"
+; Argon SoM
+DEVICE_DESCRIPTION_ARGON = "Argon SoM DFU Mode"
+; Boron SoM
+DEVICE_DESCRIPTION_BORON = "Boron SoM DFU Mode"

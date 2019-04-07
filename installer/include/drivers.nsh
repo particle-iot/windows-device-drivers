@@ -188,7 +188,7 @@ FunctionEnd
 
 !macro InstallDrivers
   DetailPrint "Installing Serial (CDC) Drivers"
-  ${If} ${IsWin10}
+  ${If} ${AtLeastWin10}
     StrCpy $0 "win10"
   ${Else}
     StrCpy $0 "win7_81"
@@ -198,11 +198,24 @@ FunctionEnd
   Pop $0
   ${EnableX64FSRedirection}
 
+  ${If} ${AtLeastWin8}
+    StrCpy $0 "win8_10"
+  ${Else}
+    StrCpy $0 "win7"
+  ${EndIf}
   DetailPrint "Installing DFU Drivers"
   ${DisableX64FSRedirection}
-  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$PLUGINSDIR\bin\$ARCH\$DEVCON" dp_add "$PLUGINSDIR\drivers\dfu\particle_dfu.inf"' ""
+  ExecDos::exec /DETAILED /TIMEOUT=60000 '"$PLUGINSDIR\bin\$ARCH\$DEVCON" dp_add "$PLUGINSDIR\drivers\dfu\$0\particle_dfu.inf"' ""
   Pop $0
   ${EnableX64FSRedirection}
+
+  ${If} ${AtMostWin7}
+    DetailPrint "Installing Control Interface Drivers"
+    ${DisableX64FSRedirection}
+    ExecDos::exec /DETAILED /TIMEOUT=60000 '"$PLUGINSDIR\bin\$ARCH\$DEVCON" dp_add "$PLUGINSDIR\drivers\control\win7\particle_dfu.inf"' ""
+    Pop $0
+    ${EnableX64FSRedirection}
+  ${EndIf}
 !macroend
 
 Function DeleteDevice
