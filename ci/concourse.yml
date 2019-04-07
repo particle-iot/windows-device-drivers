@@ -78,4 +78,5 @@ jobs:
       - aggregate:
         - put: installer-exe
           params:
-            file: installer-dev-exe/particle_drivers_dev.exe.exe
+            file: installer-dev-exe/particle_drivers_dev.exe
+
