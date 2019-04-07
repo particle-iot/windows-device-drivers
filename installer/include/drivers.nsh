@@ -212,7 +212,7 @@ FunctionEnd
   ${If} ${AtMostWin7}
     DetailPrint "Installing Control Interface Drivers"
     ${DisableX64FSRedirection}
-    ExecDos::exec /DETAILED /TIMEOUT=60000 '"$PLUGINSDIR\bin\$ARCH\$DEVCON" dp_add "$PLUGINSDIR\drivers\control\win7\particle_dfu.inf"' ""
+    ExecDos::exec /DETAILED /TIMEOUT=60000 '"$PLUGINSDIR\bin\$ARCH\$DEVCON" dp_add "$PLUGINSDIR\drivers\control\win7\particle_control.inf"' ""
     Pop $0
     ${EnableX64FSRedirection}
   ${EndIf}
