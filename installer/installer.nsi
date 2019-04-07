@@ -227,6 +227,13 @@ FunctionEnd
 
 Function .onInstSuccess
   ; !insertmacro CleanInstDir
+  # Windows 7 may require a reboot, notify about that
+  ${If} ${AtMostWin7}
+    ${IfNot} ${Silent}
+      MessageBox MB_YESNO|MB_ICONQUESTION "This version of Windows may require a reboot in order for Particle devices to be properly recognized. Reboot now?" IDNO +2
+      Reboot
+    ${EndIf}
+  ${EndIf}
 FunctionEnd
 
 Function .onInstFailed
