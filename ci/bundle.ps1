@@ -61,6 +61,9 @@ $arg = "/v", "/driver:$path\deploy\dfu\win8_10", "/os:10_X86,10_X64,Server10_X64
 # inf2cat Control Interface drivers for Windows 7
 $arg = "/v", "/driver:$path\deploy\control\win7", "/os:Server2008R2_X64,7_X64,7_X86,Server2008_X64,Server2008_X86";
 & ${inf2cat} $arg;
+# inf2cat Control Interface drivers for Windows 8 - Windows 10
+$arg = "/v", "/driver:$path\deploy\control\win8_10", "/os:10_X86,10_X64,Server10_X64,6_3_X86,6_3_X64,Server6_3_X64,8_X64,8_X86,Server8_X64";
+& ${inf2cat} $arg;
 
 # Sign serial drivers for Windows 10
 & $signtool ($sign + "$path\deploy\serial\win10\particle_serial.cat");
@@ -72,6 +75,8 @@ $arg = "/v", "/driver:$path\deploy\control\win7", "/os:Server2008R2_X64,7_X64,7_
 & $signtool ($sign + "$path\deploy\dfu\win8_10\particle_dfu.cat");
 # Sign Control Interface drivers for Windows 7
 & $signtool ($sign + "$path\deploy\control\win7\particle_control.cat");
+# Sign Control Interface drivers for Windows 8 - Windows 10
+& $signtool ($sign + "$path\deploy\control\win8_10\particle_control.cat");
 
 # Verify signatures for Windows 7 - Windows 8.1 serial drivers
 $arg = "verify", "/v", "/kp", "/c", "$path\deploy\serial\win7_81\particle_serial.cat", "$path\deploy\serial\win7_81\amd64\lowcdc_particle.sys";
