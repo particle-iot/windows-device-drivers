@@ -1,0 +1,94 @@
+; -----------------------------------------------------------------------------
+; Windows 8 to Windows 10 Particle Control Interface driver Setup File for Particle devices:
+;
+; Gen 3:
+; - Xenon (pre-1.1.0)
+; - Argon (pre-1.1.0)
+; - Boron (pre-1.1.0)
+;
+; For all the other DeviceOS versions / platforms we rely on WCID
+; -----------------------------------------------------------------------------
+
+[Version]
+Signature = "$Windows NT$"
+Class     = USBDevice
+ClassGUID = {88BAE032-5A81-49f0-BC3D-A4FF138216D6}
+Provider  = %ManufacturerName%
+CatalogFile = particle_control.cat
+DriverVer = 04/04/2019,1.0.0.0
+
+; ========== Manufacturer/Models sections ===========
+
+[Manufacturer]
+%ManufacturerName% = Standard,NTamd64,NTx86
+
+[Standard.NTx86]
+
+; Xenon
+%DEVICE_DESCRIPTION_XENON%=USB_Install, USB\VID_2B04&PID_C00E&REV_0101&MI_02
+
+; Argon
+%DEVICE_DESCRIPTION_ARGON%=USB_Install, USB\VID_2B04&PID_C00C&REV_0101&MI_02
+
+; Boron
+%DEVICE_DESCRIPTION_BORON%=USB_Install, USB\VID_2B04&PID_C00D&REV_0101&MI_02
+
+[Standard.NTamd64]
+
+; Xenon
+%DEVICE_DESCRIPTION_XENON%=USB_Install, USB\VID_2B04&PID_C00E&REV_0101&MI_02
+
+; Argon
+%DEVICE_DESCRIPTION_ARGON%=USB_Install, USB\VID_2B04&PID_C00C&REV_0101&MI_02
+
+; Boron
+%DEVICE_DESCRIPTION_BORON%=USB_Install, USB\VID_2B04&PID_C00D&REV_0101&MI_02
+
+; ========== Class definition (for Windows 8 and ealier versions)===========
+
+[ClassInstall32]
+AddReg = ClassInstall_AddReg
+
+[ClassInstall_AddReg]
+HKR,,,,%ClassName%
+HKR,,NoInstallClass,,1
+HKR,,IconPath,%REG_MULTI_SZ%,"%%systemroot%%\system32\setupapi.dll,-20"
+HKR,,LowerLogoVersion,,5.2
+
+; =================== Installation ===================
+
+[USB_Install]
+Include = winusb.inf
+Needs   = WINUSB.NT
+
+[USB_Install.Services]
+Include = winusb.inf
+Needs   = WINUSB.NT.Services
+
+[USB_Install.HW]
+AddReg=Dev_AddReg
+
+[USB_Install.Wdf]
+KmdfService=WINUSB, WinUsb_Install
+
+[WinUsb_Install]
+KmdfLibraryVersion=1.11
+
+[Dev_AddReg]
+HKR,,DeviceInterfaceGUIDs,0x10000,"{20b6cfa4-6dc7-468a-a8db-faa7c23ddea5}"
+
+; =================== Strings ===================
+
+[Strings]
+ManufacturerName="Particle"
+ClassName="Universal Serial Bus devices"
+REG_MULTI_SZ = 0x00010000
+DiskName="Particle Driver Source"
+
+; Gen3
+; Xenon
+DEVICE_DESCRIPTION_XENON = "Xenon Control Interface"
+; Argon
+DEVICE_DESCRIPTION_ARGON = "Argon Control Interface"
+; Boron
+DEVICE_DESCRIPTION_BORON = "Boron Control Interface"

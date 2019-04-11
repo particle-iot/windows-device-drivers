@@ -1,0 +1,131 @@
+; -----------------------------------------------------------------------------
+; Windows 8 to Windows 10 USB DFU Setup File for Particle devices:
+;
+; Gen 1:
+; - Core
+; Gen 2:
+; - Photon (pre-0.6.0)
+; - P1 (pre-0.6.0)
+; - Electron (pre-0.6.0)
+; Gen 3:
+; - Xenon (pre-0.9.0)
+; - Argon (pre-0.9.0)
+; - Boron (pre-0.9.0)
+; Gen 3 SoMs: WCID-only
+;
+; For all the other DeviceOS versions we rely on WCID
+; -----------------------------------------------------------------------------
+
+[Version]
+Signature = "$Windows NT$"
+Class     = USBDevice
+ClassGUID = {88BAE032-5A81-49f0-BC3D-A4FF138216D6}
+Provider  = %ManufacturerName%
+CatalogFile = particle_dfu.cat
+DriverVer = 04/04/2019,1.0.0.0
+
+; ========== Manufacturer/Models sections ===========
+
+[Manufacturer]
+%ManufacturerName% = Standard,NTamd64,NTx86
+
+[Standard.NTx86]
+; Core
+%DEVICE_DESCRIPTION_CORE%=USB_Install, USB\VID_1D50&PID_607F
+
+; Photon (pre-0.6.0)
+%DEVICE_DESCRIPTION_PHOTON%=USB_Install, USB\VID_2B04&PID_D006&REV_0200
+
+; P1 (pre-0.6.0)
+%DEVICE_DESCRIPTION_P1%=USB_Install, USB\VID_2B04&PID_D008&REV_0200
+
+; Electron (pre-0.6.0)
+%DEVICE_DESCRIPTION_ELECTRON%=USB_Install, USB\VID_2B04&PID_D00A&REV_0200
+
+; Xenon (pre-0.9.0)
+%DEVICE_DESCRIPTION_XENON%=USB_Install, USB\VID_2B04&PID_D00E&REV_0250
+
+; Argon (pre-0.9.0)
+%DEVICE_DESCRIPTION_ARGON%=USB_Install, USB\VID_2B04&PID_D00C&REV_0250
+
+; Boron (pre-0.9.0)
+%DEVICE_DESCRIPTION_BORON%=USB_Install, USB\VID_2B04&PID_D00D&REV_0250
+
+[Standard.NTamd64]
+; Core
+%DEVICE_DESCRIPTION_CORE%=USB_Install, USB\VID_1D50&PID_607F
+
+; Photon (pre-0.6.0)
+%DEVICE_DESCRIPTION_PHOTON%=USB_Install, USB\VID_2B04&PID_D006&REV_0200
+
+; P1 (pre-0.6.0)
+%DEVICE_DESCRIPTION_P1%=USB_Install, USB\VID_2B04&PID_D008&REV_0200
+
+; Electron (pre-0.6.0)
+%DEVICE_DESCRIPTION_ELECTRON%=USB_Install, USB\VID_2B04&PID_D00A&REV_0200
+
+; Xenon (pre-0.9.0)
+%DEVICE_DESCRIPTION_XENON%=USB_Install, USB\VID_2B04&PID_D00E&REV_0250
+
+; Argon (pre-0.9.0)
+%DEVICE_DESCRIPTION_ARGON%=USB_Install, USB\VID_2B04&PID_D00C&REV_0250
+
+; Boron (pre-0.9.0)
+%DEVICE_DESCRIPTION_BORON%=USB_Install, USB\VID_2B04&PID_D00D&REV_0250
+
+; ========== Class definition (for Windows 8 and ealier versions)===========
+
+[ClassInstall32]
+AddReg = ClassInstall_AddReg
+
+[ClassInstall_AddReg]
+HKR,,,,%ClassName%
+HKR,,NoInstallClass,,1
+HKR,,IconPath,%REG_MULTI_SZ%,"%%systemroot%%\system32\setupapi.dll,-20"
+HKR,,LowerLogoVersion,,5.2
+
+; =================== Installation ===================
+
+[USB_Install]
+Include = winusb.inf
+Needs   = WINUSB.NT
+
+[USB_Install.Services]
+Include = winusb.inf
+Needs   = WINUSB.NT.Services
+
+[USB_Install.HW]
+AddReg=Dev_AddReg
+
+[USB_Install.Wdf]
+KmdfService=WINUSB, WinUsb_Install
+
+[WinUsb_Install]
+KmdfLibraryVersion=1.11
+
+[Dev_AddReg]
+HKR,,DeviceInterfaceGUIDs,0x10000,"{37fb5f90-1a34-4929-933b-8a27e1850033}"
+
+; =================== Strings ===================
+
+[Strings]
+ManufacturerName="Particle"
+ClassName="Universal Serial Bus devices"
+REG_MULTI_SZ = 0x00010000
+
+; Gen 1
+DEVICE_DESCRIPTION_CORE = "Core DFU Mode"
+; Gen 2
+; Photon
+DEVICE_DESCRIPTION_PHOTON ="Photon DFU Mode"
+; P1
+DEVICE_DESCRIPTION_P1 ="P1 DFU Mode"
+; Electron
+DEVICE_DESCRIPTION_ELECTRON = "Electron DFU Mode"
+; Gen3
+; Xenon
+DEVICE_DESCRIPTION_XENON = "Xenon DFU Mode"
+; Argon
+DEVICE_DESCRIPTION_ARGON = "Argon DFU Mode"
+; Boron
+DEVICE_DESCRIPTION_BORON = "Boron DFU Mode"

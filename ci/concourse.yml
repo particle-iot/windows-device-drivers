@@ -1,0 +1,82 @@
+# Concourse pipeline to build the Windows drivers installer
+#
+# Update with
+# fly -t production set-pipeline -c ci/concourse.yml -p windows-device-drivers
+
+groups:
+  - name: windows-device-drivers
+    resources:
+      - source-code
+      - installer-dev-exe
+      - installer-exe
+    jobs:
+      - build-installer
+      - release-installer
+
+resources:
+  - name: source-code
+    type: git
+    source:
+      uri: git@github.com:particle-iot/windows-device-drivers.git
+      private_key: ((concourse-ci-git-private-key.key))
+
+  - name: installer-dev-exe
+    type: s3
+    source:
+      bucket: binaries.particle.io
+      access_key_id: ((aws-credentials-3-binaries-particle-io.key))
+      secret_access_key: ((aws-credentials-3-binaries-particle-io.secret))
+      region_name: us-east-1
+      versioned_file: drivers/windows/particle_drivers_dev.exe
+
+  - name: installer-exe
+    type: s3
+    source:
+      bucket: binaries.particle.io
+      access_key_id: ((aws-credentials-3-binaries-particle-io.key))
+      secret_access_key: ((aws-credentials-3-binaries-particle-io.secret))
+      region_name: us-east-1
+      versioned_file: drivers/windows/particle_drivers.exe
+
+jobs:
+  - name: build-installer
+    serial: true
+    plan:
+      - get: source-code
+        trigger: true
+      - task: build
+        config:
+          platform: windows
+          inputs:
+            - name: source-code
+          outputs:
+            - name: installer-build
+          run:
+            path: powershell.exe
+            args: [source-code/ci/ci.ps1]
+        params:
+          encryption_secret: ((windows-code-signing-certificate.encryption_secret))
+          key_secret: ((windows-code-signing-certificate.key_secret))
+          setup_build_env: C:\ewdk\BuildEnv\SetupBuildEnv.cmd
+          # Environment should set all the paths correctly
+          signtool: signtool
+          inf2cat: inf2cat
+          msbuild: msbuild
+          installer_output_dir: installer-build
+      - aggregate:
+        - put: installer-dev-exe
+          params:
+            file: installer-build/particle_drivers.exe
+
+  - name: release-installer
+    plan:
+      # Get trigged manually by clicking + in concourse web interface
+      - get: installer-dev-exe
+        trigger: false
+        passed:
+          - build-installer
+      - aggregate:
+        - put: installer-exe
+          params:
+            file: installer-dev-exe/particle_drivers_dev.exe
+

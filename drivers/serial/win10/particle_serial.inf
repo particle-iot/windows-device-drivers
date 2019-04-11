@@ -1,0 +1,230 @@
+; -----------------------------------------------------------------------------
+; Windows 10 USB CDC Setup File for Particle devices:
+;
+; Gen 1:
+; - Core
+; Gen 2:
+; - Photon
+; - P1
+; - Electron
+; Gen 3:
+; - Xenon
+; - Argon
+; - Boron
+; Gen 3 SoMs:
+; - Xenon SoM
+; - Argon SoM
+; - Boron SoM
+; -----------------------------------------------------------------------------
+
+[Version]
+Signature="$Windows NT$"
+Class=Ports
+ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
+Provider=%PROVIDER%
+LayoutFile=layout.inf
+DriverVer=04/04/2019,1.0.0.0
+CatalogFile=particle_serial.cat
+
+[Manufacturer]
+%PROVIDER%=DeviceList, NTx86, NTamd64
+
+;------------------------------------------------------------------------------
+; Devices
+;------------------------------------------------------------------------------
+
+[DeviceList.NTx86]
+; Core
+%DEVICE_DESCRIPTION_CORE%=DriverInstall, USB\VID_1D50&PID_607D
+
+; Photon
+%DEVICE_DESCRIPTION_PHOTON_1%=DriverInstall, USB\VID_2B04&PID_C006&MI_00
+%DEVICE_DESCRIPTION_PHOTON_2%=DriverInstall, USB\VID_2B04&PID_C006&MI_03
+; Photon pre-0.6.0
+%DEVICE_DESCRIPTION_PHOTON_3%=DriverInstall, USB\VID_2B04&PID_C006&REV_0200
+
+; P1
+%DEVICE_DESCRIPTION_P1_1%=DriverInstall, USB\VID_2B04&PID_C008&MI_00
+%DEVICE_DESCRIPTION_P1_2%=DriverInstall, USB\VID_2B04&PID_C008&MI_03
+; P1 pre-0.6.0
+%DEVICE_DESCRIPTION_P1_3%=DriverInstall, USB\VID_2B04&PID_C008&REV_0200
+
+; Electron
+%DEVICE_DESCRIPTION_ELECTRON_1%=DriverInstall, USB\VID_2B04&PID_C00A&MI_00
+%DEVICE_DESCRIPTION_ELECTRON_2%=DriverInstall, USB\VID_2B04&PID_C00A&MI_03
+; Electron pre-0.6.0
+%DEVICE_DESCRIPTION_ELECTRON_3%=DriverInstall, USB\VID_2B04&PID_C00A&REV_0200
+
+; Xenon pre-0.9.0
+%DEVICE_DESCRIPTION_XENON_1%=DriverInstall, USB\VID_2B04&PID_C00E&REV_0100
+; Xenon 0.9.0
+%DEVICE_DESCRIPTION_XENON_2%=DriverInstall, USB\VID_2B04&PID_C00E&REV_0101&MI_00
+; Xenon
+%DEVICE_DESCRIPTION_XENON_3%=DriverInstall, USB\VID_2B04&PID_C00E&MI_00
+
+; Argon pre-0.9.0
+%DEVICE_DESCRIPTION_ARGON_1%=DriverInstall, USB\VID_2B04&PID_C00C&REV_0100
+; Argon 0.9.0
+%DEVICE_DESCRIPTION_ARGON_2%=DriverInstall, USB\VID_2B04&PID_C00C&REV_0101&MI_00
+; Argon
+%DEVICE_DESCRIPTION_ARGON_3%=DriverInstall, USB\VID_2B04&PID_C00C&MI_00
+
+; Boron pre-0.9.0
+%DEVICE_DESCRIPTION_BORON_1%=DriverInstall, USB\VID_2B04&PID_C00D&REV_0100
+; Boron 0.9.0
+%DEVICE_DESCRIPTION_BORON_2%=DriverInstall, USB\VID_2B04&PID_C00D&REV_0101&MI_00
+; Boron
+%DEVICE_DESCRIPTION_BORON_3%=DriverInstall, USB\VID_2B04&PID_C00D&MI_00
+
+; Xenon SoM
+%DEVICE_DESCRIPTION_XENON_SOM_1%=DriverInstall, USB\VID_2B04&PID_C018&MI_00
+
+; Argon SoM
+%DEVICE_DESCRIPTION_ARGON_SOM_1%=DriverInstall, USB\VID_2B04&PID_C016&MI_00
+
+; Boron SoM
+%DEVICE_DESCRIPTION_BORON_SOM_1%=DriverInstall, USB\VID_2B04&PID_C017&MI_00
+
+[DeviceList.NTamd64]
+; Core
+%DEVICE_DESCRIPTION_CORE%=DriverInstall, USB\VID_1D50&PID_607D
+
+; Photon
+%DEVICE_DESCRIPTION_PHOTON_1%=DriverInstall, USB\VID_2B04&PID_C006&MI_00
+%DEVICE_DESCRIPTION_PHOTON_2%=DriverInstall, USB\VID_2B04&PID_C006&MI_03
+; Photon pre-0.6.0
+%DEVICE_DESCRIPTION_PHOTON_3%=DriverInstall, USB\VID_2B04&PID_C006&REV_0200
+
+; P1
+%DEVICE_DESCRIPTION_P1_1%=DriverInstall, USB\VID_2B04&PID_C008&MI_00
+%DEVICE_DESCRIPTION_P1_2%=DriverInstall, USB\VID_2B04&PID_C008&MI_03
+; P1 pre-0.6.0
+%DEVICE_DESCRIPTION_P1_3%=DriverInstall, USB\VID_2B04&PID_C008&REV_0200
+
+; Electron
+%DEVICE_DESCRIPTION_ELECTRON_1%=DriverInstall, USB\VID_2B04&PID_C00A&MI_00
+%DEVICE_DESCRIPTION_ELECTRON_2%=DriverInstall, USB\VID_2B04&PID_C00A&MI_03
+; Electron pre-0.6.0
+%DEVICE_DESCRIPTION_ELECTRON_3%=DriverInstall, USB\VID_2B04&PID_C00A&REV_0200
+
+; Xenon pre-0.9.0
+%DEVICE_DESCRIPTION_XENON_1%=DriverInstall, USB\VID_2B04&PID_C00E&REV_0100
+; Xenon 0.9.0
+%DEVICE_DESCRIPTION_XENON_2%=DriverInstall, USB\VID_2B04&PID_C00E&REV_0101&MI_00
+; Xenon
+%DEVICE_DESCRIPTION_XENON_3%=DriverInstall, USB\VID_2B04&PID_C00E&MI_00
+
+; Argon pre-0.9.0
+%DEVICE_DESCRIPTION_ARGON_1%=DriverInstall, USB\VID_2B04&PID_C00C&REV_0100
+; Argon 0.9.0
+%DEVICE_DESCRIPTION_ARGON_2%=DriverInstall, USB\VID_2B04&PID_C00C&REV_0101&MI_00
+; Argon
+%DEVICE_DESCRIPTION_ARGON_3%=DriverInstall, USB\VID_2B04&PID_C00C&MI_00
+
+; Boron pre-0.9.0
+%DEVICE_DESCRIPTION_BORON_1%=DriverInstall, USB\VID_2B04&PID_C00D&REV_0100
+; Boron 0.9.0
+%DEVICE_DESCRIPTION_BORON_2%=DriverInstall, USB\VID_2B04&PID_C00D&REV_0101&MI_00
+; Boron
+%DEVICE_DESCRIPTION_BORON_3%=DriverInstall, USB\VID_2B04&PID_C00D&MI_00
+
+; Xenon SoM
+%DEVICE_DESCRIPTION_XENON_SOM_1%=DriverInstall, USB\VID_2B04&PID_C018&MI_00
+
+; Argon SoM
+%DEVICE_DESCRIPTION_ARGON_SOM_1%=DriverInstall, USB\VID_2B04&PID_C016&MI_00
+
+; Boron SoM
+%DEVICE_DESCRIPTION_BORON_SOM_1%=DriverInstall, USB\VID_2B04&PID_C017&MI_00
+
+;------------------------------------------------------------------------------
+; Files
+;------------------------------------------------------------------------------
+
+[DestinationDirs]
+DefaultDestDir=12
+FakeModemCopyFileSection=12
+
+[SourceDisksNames]
+1=%SourceName%
+
+;------------------------------------------------------------------------------
+; Standard CDC
+;------------------------------------------------------------------------------
+
+[DriverInstall]
+include=mdmcpq.inf
+CopyFiles=FakeModemCopyFileSection
+AddReg=DriverInstall.AddReg
+
+[DriverInstall.HW]
+AddReg=DriverInstall.HW.AddReg
+
+[DriverInstall.AddReg]
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[DriverInstall.HW.AddReg]
+HKR,,NTMPDriver,,*ntkern
+HKR,,NTMPDriver,,usbser.sys
+HKR,,PortSubClass,1,01
+
+[DriverInstall.Services]
+AddService=usbser, 0x00000002, UsbserService
+
+;------------------------------------------------------------------------------
+;  Usbser Service
+;------------------------------------------------------------------------------
+
+[UsbserService]
+DisplayName=%USBSER.DESC%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\usbser.sys
+LoadOrderGroup = PNP Filter
+
+;------------------------------------------------------------------------------
+;  String Definitions
+;------------------------------------------------------------------------------
+
+[Strings]
+PROVIDER="Particle"
+; Gen 1
+DEVICE_DESCRIPTION_CORE = "Core Serial"
+; Gen 2
+; Photon
+DEVICE_DESCRIPTION_PHOTON_1 ="Photon Serial"
+DEVICE_DESCRIPTION_PHOTON_2 ="Photon USBSerial1"
+DEVICE_DESCRIPTION_PHOTON_3 ="Photon Serial"
+; P1
+DEVICE_DESCRIPTION_P1_1 ="P1 Serial"
+DEVICE_DESCRIPTION_P1_2 ="P1 USBSerial1"
+DEVICE_DESCRIPTION_P1_3 ="P1 Serial"
+; Electron
+DEVICE_DESCRIPTION_ELECTRON_1 = "Electron Serial"
+DEVICE_DESCRIPTION_ELECTRON_2 = "Electron USBSerial1"
+DEVICE_DESCRIPTION_ELECTRON_3 = "Electron Serial"
+; Gen3
+; Xenon
+DEVICE_DESCRIPTION_XENON_1 = "Xenon Serial"
+DEVICE_DESCRIPTION_XENON_2 = "Xenon Serial"
+DEVICE_DESCRIPTION_XENON_3 = "Xenon Serial"
+; Argon
+DEVICE_DESCRIPTION_ARGON_1 = "Argon Serial"
+DEVICE_DESCRIPTION_ARGON_2 = "Argon Serial"
+DEVICE_DESCRIPTION_ARGON_3 = "Argon Serial"
+; Boron
+DEVICE_DESCRIPTION_BORON_1 = "Boron Serial"
+DEVICE_DESCRIPTION_BORON_2 = "Boron Serial"
+DEVICE_DESCRIPTION_BORON_3 = "Boron Serial"
+; Gen SoMs
+; Xenon SoM
+DEVICE_DESCRIPTION_XENON_SOM_1 = "Xenon SoM Serial"
+; Argon SoM
+DEVICE_DESCRIPTION_ARGON_SOM_1 = "Argon SoM Serial"
+; Boron SoM
+DEVICE_DESCRIPTION_BORON_SOM_1 = "Boron SoM Serial"
+
+USBSER.DESC = "USB Serial Driver"
+
+SourceName = "Particle Driver Source"
