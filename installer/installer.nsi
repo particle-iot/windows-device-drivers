@@ -30,7 +30,7 @@ ${StrCase}
 ;General
 
   ; Request application privileges for Windows Vista
-  RequestExecutionLevel highest
+  RequestExecutionLevel admin
 
   !define MUI_ICON "resources\particle.ico"
 
